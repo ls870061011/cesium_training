@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<head>
+  <title>Hello World</title>
+  <script src="../Build/Cesium/Cesium.js"></script>
+  <link href="../Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    /* 隐藏logo */
+    /* .cesium-widget-credits {
+      display: none !important;
+      visibility: hide !important;
+    } */
+
+    /* 通过CSS控制组件显隐及位置 */
+    .cesium-viewer-toolbar,             /* 右上角按钮组 */
+    .cesium-viewer-animationContainer,  /* 左下角动画控件 */
+    .cesium-viewer-timelineContainer,   /* 时间线 */
+    .cesium-viewer-bottom               /* logo信息 */ {
+      /* display: none !important;
+      visibility: hide !important; */
+    }
+    .cesium-viewer-fullscreenContainer  /* 全屏按钮 */ {
+      /* position: absolute;
+      top: 0; */
+    }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    var viewer = new Cesium.Viewer("cesiumContainer", {
+      animation: false, // 动画小组件
+      baseLayerPicker: true, // 底图组件，选择三维数字地球的底图（imagery and terrain）。
+      fullscreenButton: false, // 全屏组件
+      vrButton: false, // VR模式
+      geocoder: false, // 地理编码（搜索）组件
+      homeButton: false, // 首页，点击之后将视图跳转到默认视角
+      infoBox: false, // 信息框
+      sceneModePicker: false, // 场景模式，切换2D、3D 和 Columbus View (CV) 模式。
+      selectionIndicator: false, //是否显示选取指示器组件
+      timeline: false, // 时间轴
+      navigationHelpButton: false, // 帮助提示，如何操作数字地球。
+      navigationInstructionsInitiallyVisible: false, // 如果最初应该看到导航说明，则为true；如果直到用户明确单击该按钮，则该提示不显示，否则为false。
+      // Show Columbus View map with Web Mercator projection
+      mapProjection: new Cesium.WebMercatorProjection(),
+      terrainProvider: new Cesium.CesiumTerrainProvider({
+        url: Cesium.IonResource.fromAssetId(3956),
+      }),
+    });
+
+    // 隐藏logo
+    viewer._cesiumWidget._creditContainer.style.display = "none";
+
+    // 自定义影像图层
+    var imageProviderVMs = [];
+    let gaodeImageProvider = new Cesium.UrlTemplateImageryProvider({
+      url:
+        "http://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}",
+      subdomains: ["1", "2", "3", "4"],
+    });
+    var gaodeVM = new Cesium.ProviderViewModel({
+      name: "高德矢量",
+      iconUrl: Cesium.buildModuleUrl(
+        "Widgets/Images/ImageryProviders/openStreetMap.png"
+      ),
+      tooltip: "高德矢量 地图服务",
+      creationFunction: function () {
+        return gaodeImageProvider;
+      },
+    });
+    imageProviderVMs.push(gaodeVM);
+    viewer.baseLayerPicker.viewModel.imageryProviderViewModels = imageProviderVMs;
+
+    // 自定义地形图层
+    var terrainProviderVMs = [];
+    var terrainProvider = new Cesium.ArcGISTiledElevationTerrainProvider({
+      url:
+        "https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer",
+      token:
+        "KED1aF_I4UzXOHy3BnhwyBHU4l5oY6rO6walkmHoYqGp4XyIWUd5YZUC1ZrLAzvV40pR6gBXQayh0eFA8m6vPg..",
+    });
+    var arcgisVM = new Cesium.ProviderViewModel({
+      name: "ArcGIS地形",
+      iconUrl: Cesium.buildModuleUrl(
+        "Widgets/Images/TerrainProviders/Ellipsoid.png"
+      ),
+      tooltip: "ArcGIS地形服务",
+      creationFunction: function () {
+        return terrainProvider;
+      },
+    });
+    terrainProviderVMs.push(arcgisVM);
+    viewer.baseLayerPicker.viewModel.terrainProviderViewModels = terrainProviderVMs;
+  </script>
+</body>

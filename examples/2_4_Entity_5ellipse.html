@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<head>
+  <title>Hello World</title>
+  <script src="../Build/Cesium/Cesium.js"></script>
+  <link href="../Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    var viewer = new Cesium.Viewer("cesiumContainer", {
+      animation: false, // 动画小组件
+      baseLayerPicker: false, // 底图组件，选择三维数字地球的底图（imagery and terrain）。
+      fullscreenButton: false, // 全屏组件
+      vrButton: false, // VR模式
+      geocoder: false, // 地理编码（搜索）组件
+      homeButton: false, // 首页，点击之后将视图跳转到默认视角
+      infoBox: false, // 信息框
+      sceneModePicker: false, // 场景模式，切换2D、3D 和 Columbus View (CV) 模式。
+      selectionIndicator: false, //是否显示选取指示器组件
+      timeline: false, // 时间轴
+      navigationHelpButton: false, // 帮助提示，如何操作数字地球。
+      navigationInstructionsInitiallyVisible: false, // 如果最初应该看到导航说明，则为true；如果直到用户明确单击该按钮，则该提示不显示，否则为false。
+      shouldAnimate: true,
+    });
+
+    // 隐藏logo
+    viewer._cesiumWidget._creditContainer.style.display = "none";
+
+    var entity = viewer.entities.add({
+      name: "Circles and Ellipses",
+      position: Cesium.Cartesian3.fromDegrees(-95.0, 40.0, 100000.0),
+      ellipse: {
+        show: true,
+        semiMajorAxis: 300000.0, // 长半轴距离
+        semiMinorAxis: 150000.0, // 短半轴距离
+
+        height: 20000.0,
+        heightReference: Cesium.HeightReference.NONE,
+        extrudedHeight: 20000.0,
+        extrudedHeightReference: Cesium.HeightReference.NONE,
+
+        // rotation: Cesium.Math.toRadians(45), // 从北方逆时针旋转
+        stRotation: 0.0, // 纹理从北方逆时针旋转
+        granularity: Cesium.Math.RADIANS_PER_DEGREE, // 椭圆上各点之间的角距离
+        material: Cesium.Color.BLUE.withAlpha(0.5),
+        fill: true,
+        outline: true,
+        outlineColor: Cesium.Color.DARK_GREEN,
+        outlineWidth: 1.0,
+        numberOfVerticalLines: 16, // 沿轮廓的周长绘制的垂直线的数量
+        shadows: Cesium.ShadowMode.DISABLED,
+        // distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
+        //   1.0e3,
+        //   2.0e3
+        // ),
+
+        // 在地面上时将对地形，3D tiles还是对两者进行分类  type:ClassificationType  default:ClassificationType.BOTH
+        // TERRAIN 将仅对地形进行分类;CESIUM_3D_TILE 将仅对3D瓷砖进行分类;BOTH	将同时对Terrain和3D Tile进行分类。
+        classificationType: Cesium.ClassificationType.BOTH,
+      },
+    });
+
+    viewer.zoomTo(viewer.entities);
+  </script>
+</body>

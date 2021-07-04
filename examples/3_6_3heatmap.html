@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<head>
+  <title>Hello World</title>
+  <script src="../Build/Cesium/Cesium.js"></script>
+  <script src="./libs/heatmap.js"></script>
+  <link href="../Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    #heatmap {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <!-- 用于显示热力图的div -->
+  <div class="heatmap" style="display: none; height: 400px; width: 600px">
+  </div>
+  <script>
+    var viewer = new Cesium.Viewer("cesiumContainer");
+    viewer._cesiumWidget._creditContainer.style.display = "none";
+
+    var len = 300;
+    var points = [];
+    var max = 100;
+    var width = 600;
+    var height = 400;
+
+    // 热力图经纬度范围
+    var latMin = 28.364807;
+    var latMax = 40.251095;
+    var lonMin = 94.389228;
+    var lonMax = 108.666357;
+
+    // 根据热力图图片范围，生成随机热力点和强度值
+    var dataRaw = [];
+    for (var i = 0; i < len; i++) {
+      var point = {
+        lat: latMin + Math.random() * (latMax - latMin),
+        lon: lonMin + Math.random() * (lonMax - lonMin),
+        value: Math.floor(Math.random() * 100),
+      };
+      dataRaw.push(point);
+    }
+    // 生成数据
+    for (var i = 0; i < len; i++) {
+      var dataItem = dataRaw[i];
+      var point = {
+        x: Math.floor(((dataItem.lat - latMin) / (latMax - latMin)) * width),
+        y: Math.floor(((dataItem.lon - lonMin) / (lonMax - lonMin)) * height),
+        value: Math.floor(dataItem.value),
+      };
+      max = Math.max(max, dataItem.value);
+      points.push(point);
+    }
+
+    // 创建热力图
+    var heatmapInstance = h337.create({
+      container: document.querySelector(".heatmap"),
+    });
+
+    var data = {
+      max: max,
+      data: points,
+    };
+    heatmapInstance.setData(data);
+
+    // 将热力图添加到球体上(生成的热力图canvas元素类名为heatmap-canvas)
+    var canvas = document.getElementsByClassName("heatmap-canvas");
+    // console.log(canvas);
+    viewer.entities.add({
+      name: "heatmap",
+      rectangle: {
+        coordinates: Cesium.Rectangle.fromDegrees(
+          lonMin,
+          latMin,
+          lonMax,
+          latMax
+        ),
+        material: new Cesium.ImageMaterialProperty({
+          image: canvas[0],
+          transparent: true,
+        }),
+      },
+    });
+
+    viewer.zoomTo(viewer.entities);
+  </script>
+</body>

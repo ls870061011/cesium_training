@@ -1,0 +1,213 @@
+<!--支持从VT MAK VR-TheWorld Server服务器请求的高度地图地形图。-->
+<!DOCTYPE html>
+<head>
+  <title>Hello World</title>
+  <script src="../Build/Cesium/Cesium.js"></script>
+  <link href="../Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    var viewer = new Cesium.Viewer("cesiumContainer");
+
+    var polygon = new Cesium.PolygonGeometry({
+      polygonHierarchy: new Cesium.PolygonHierarchy(
+        Cesium.Cartesian3.fromDegreesArray([
+          -109.0,
+          30.0,
+          -95.0,
+          30.0,
+          -95.0,
+          40.0,
+          -109.0,
+          40.0,
+        ]),
+        [
+          new Cesium.PolygonHierarchy(
+            Cesium.Cartesian3.fromDegreesArray([
+              -107.0,
+              31.0,
+              -107.0,
+              39.0,
+              -97.0,
+              39.0,
+              -97.0,
+              31.0,
+            ]),
+            [
+              new Cesium.PolygonHierarchy(
+                Cesium.Cartesian3.fromDegreesArray([
+                  -105.0,
+                  33.0,
+                  -99.0,
+                  33.0,
+                  -99.0,
+                  37.0,
+                  -105.0,
+                  37.0,
+                ]),
+                [
+                  new Cesium.PolygonHierarchy(
+                    Cesium.Cartesian3.fromDegreesArray([
+                      -103.0,
+                      34.0,
+                      -101.0,
+                      34.0,
+                      -101.0,
+                      36.0,
+                      -103.0,
+                      36.0,
+                    ])
+                  ),
+                ]
+              ),
+            ]
+          ),
+        ]
+      ),
+      height: 0.0,
+      extrudedHeight: 0.0,
+      vertexFormat: Cesium.PerInstanceColorAppearance.VERTEX_FORMAT,
+      stRotation: 0.0, // 纹理的旋转坐标（以弧度为单位）,正旋转是逆时针方向
+      ellipsoid: Cesium.Ellipsoid.WGS84,
+      granularity: Cesium.Math.RADIANS_PER_DEGREE, // 每个纬度和经度之间的距离（以弧度为单位）,确定缓冲区中的位置数
+      perPositionHeight: false, // 每个位置点使用的高度
+      closeTop: true,
+      closeBottom: true,
+      // NONE 与椭圆表面不符的直线;GEODESIC 遵循测地路径;RHUMB	遵循大黄蜂或恶魔般的道路。
+      arcType: Cesium.ArcType.GEODESIC, // 多边形边缘线型
+    });
+
+    var polygonInstance = new Cesium.GeometryInstance({
+      geometry: polygon,
+      // modelMatrix: Cesium.Matrix4.multiplyByTranslation(
+      //   Cesium.Transforms.eastNorthUpToFixedFrame(
+      //     Cesium.Cartesian3.fromDegrees(-65, 40)
+      //   ),
+      //   new Cesium.Cartesian3(0.0, 0.0, 10.0),
+      //   new Cesium.Matrix4()
+      // ),
+      id: "polygon",
+      attributes: {
+        color: Cesium.ColorGeometryInstanceAttribute.fromColor(
+          Cesium.Color.BLUE
+        ),
+        show: new Cesium.ShowGeometryInstanceAttribute(true), //显示或者隐藏
+      },
+    });
+
+    viewer.scene.primitives.add(
+      new Cesium.Primitive({
+        geometryInstances: polygonInstance,
+        appearance: new Cesium.PerInstanceColorAppearance({
+          translucent: false,
+          closed: false,
+        }),
+      })
+    );
+
+    var polygonOutline = new Cesium.PolygonOutlineGeometry({
+      polygonHierarchy: new Cesium.PolygonHierarchy(
+        Cesium.Cartesian3.fromDegreesArray([
+          -109.0,
+          30.0,
+          -95.0,
+          30.0,
+          -95.0,
+          40.0,
+          -109.0,
+          40.0,
+        ]),
+        [
+          new Cesium.PolygonHierarchy(
+            Cesium.Cartesian3.fromDegreesArray([
+              -107.0,
+              31.0,
+              -107.0,
+              39.0,
+              -97.0,
+              39.0,
+              -97.0,
+              31.0,
+            ]),
+            [
+              new Cesium.PolygonHierarchy(
+                Cesium.Cartesian3.fromDegreesArray([
+                  -105.0,
+                  33.0,
+                  -99.0,
+                  33.0,
+                  -99.0,
+                  37.0,
+                  -105.0,
+                  37.0,
+                ]),
+                [
+                  new Cesium.PolygonHierarchy(
+                    Cesium.Cartesian3.fromDegreesArray([
+                      -103.0,
+                      34.0,
+                      -101.0,
+                      34.0,
+                      -101.0,
+                      36.0,
+                      -103.0,
+                      36.0,
+                    ])
+                  ),
+                ]
+              ),
+            ]
+          ),
+        ]
+      ),
+      height: 0.0,
+      extrudedHeight: 10000.0,
+      vertexFormat: Cesium.PerInstanceColorAppearance.VERTEX_FORMAT,
+      ellipsoid: Cesium.Ellipsoid.WGS84,
+      granularity: Cesium.Math.RADIANS_PER_DEGREE, // 每个纬度和经度之间的距离（以弧度为单位）,确定缓冲区中的位置数
+      perPositionHeight: false, // 每个位置点使用的高度
+      // NONE 与椭圆表面不符的直线;GEODESIC 遵循测地路径;RHUMB	遵循大黄蜂或恶魔般的道路。
+      arcType: Cesium.ArcType.GEODESIC, // 多边形边缘线型
+    });
+
+    var polygonOutlineInstance = new Cesium.GeometryInstance({
+      geometry: polygonOutline,
+      // modelMatrix: Cesium.Matrix4.multiplyByTranslation(
+      //   Cesium.Transforms.eastNorthUpToFixedFrame(
+      //     Cesium.Cartesian3.fromDegrees(-65, 40)
+      //   ),
+      //   new Cesium.Cartesian3(0.0, 0.0, 10.0),
+      //   new Cesium.Matrix4()
+      // ),
+      id: "polygonOutline",
+      attributes: {
+        color: Cesium.ColorGeometryInstanceAttribute.fromColor(
+          Cesium.Color.RED
+        ),
+        show: new Cesium.ShowGeometryInstanceAttribute(true), //显示或者隐藏
+      },
+    });
+
+    viewer.scene.primitives.add(
+      new Cesium.Primitive({
+        geometryInstances: polygonOutlineInstance,
+        appearance: new Cesium.PerInstanceColorAppearance({
+          translucent: false,
+          closed: false,
+        }),
+      })
+    );
+  </script>
+</body>

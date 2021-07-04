@@ -1,0 +1,92 @@
+<!--支持从VT MAK VR-TheWorld Server服务器请求的高度地图地形图。-->
+<!DOCTYPE html>
+<head>
+  <title>Hello World</title>
+  <script src="../Build/Cesium/Cesium.js"></script>
+  <link href="../Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    var viewer = new Cesium.Viewer("cesiumContainer", {
+      animation: false, // 动画小组件
+      baseLayerPicker: false, // 底图组件，选择三维数字地球的底图（imagery and terrain）。
+      fullscreenButton: false, // 全屏组件
+      vrButton: false, // VR模式
+      geocoder: false, // 地理编码（搜索）组件
+      homeButton: false, // 首页，点击之后将视图跳转到默认视角
+      infoBox: false, // 信息框
+      sceneModePicker: false, // 场景模式，切换2D、3D 和 Columbus View (CV) 模式。
+      selectionIndicator: false, //是否显示选取指示器组件
+      timeline: false, // 时间轴
+      navigationHelpButton: false, // 帮助提示，如何操作数字地球。
+      navigationInstructionsInitiallyVisible: false, // 如果最初应该看到导航说明，则为true；如果直到用户明确单击该按钮，则该提示不显示，否则为false。
+      shouldAnimate: true,
+    });
+
+    // 隐藏logo
+    viewer._cesiumWidget._creditContainer.style.display = "none";
+
+    var position = Cesium.Cartesian3.fromDegrees(-123.0744619, 44.0503706);
+    var url = "./data/models/CesiumMan/Cesium_Man.glb";
+    viewer.trackedEntity = viewer.entities.add({
+      name: url,
+      position: position,
+      model: {
+        uri: url,
+      },
+    });
+
+    var viewModel = {
+      blackAndWhiteShow: false,
+      blackAndWhiteGradations: 5.0,
+      brightnessShow: false,
+      brightnessValue: 0.5,
+      nightVisionShow: false,
+      silhouette: true,
+    };
+
+    Cesium.knockout.track(viewModel);
+
+    var stages = viewer.scene.postProcessStages;
+    var silhouette = stages.add(
+      // 创建一个应用轮廓效果的后期处理阶段 描边
+      Cesium.PostProcessStageLibrary.createSilhouetteStage()
+    );
+    var blackAndWhite = stages.add(
+      // 以黑色和白色渐变渲染输入纹理
+      Cesium.PostProcessStageLibrary.createBlackAndWhiteStage()
+    );
+    var brightness = stages.add(
+      Cesium.PostProcessStageLibrary.createBrightnessStage()
+    );
+    var nightVision = stages.add(
+      // 将夜视效果添加到输入纹理中
+      Cesium.PostProcessStageLibrary.createNightVisionStage()
+    );
+
+    function updatePostProcess() {
+      silhouette.enabled = Boolean(viewModel.silhouette);
+      silhouette.uniforms.color = Cesium.Color.YELLOW;
+      blackAndWhite.enabled = Boolean(viewModel.blackAndWhiteShow);
+      blackAndWhite.uniforms.gradations = Number(
+        viewModel.blackAndWhiteGradations
+      );
+      brightness.enabled = Boolean(viewModel.brightnessShow);
+      brightness.uniforms.brightness = Number(viewModel.brightnessValue);
+      nightVision.enabled = Boolean(viewModel.nightVisionShow);
+    }
+    updatePostProcess();
+  </script>
+</body>

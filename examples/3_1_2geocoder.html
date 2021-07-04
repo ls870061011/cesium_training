@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<head>
+  <title>Hello World</title>
+  <script src="../Build/Cesium/Cesium.js"></script>
+  <link href="../Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    /**
+     * This class is an example of a custom geocoder. It provides geocoding through the OpenStreetMap Nominatim service.
+     * @alias OpenStreetMapNominatimGeocoder
+     * @constructor
+     */
+    function OpenStreetMapNominatimGeocoder() {}
+
+    /**
+     * The function called to geocode using this geocoder service.
+     *
+     * @param {String} input The query to be sent to the geocoder service
+     * @returns {Promise<GeocoderService.Result[]>}
+     */
+    OpenStreetMapNominatimGeocoder.prototype.geocode = function (input) {
+      var url = "https://nominatim.openstreetmap.org/search";
+      var resource = new Cesium.Resource({
+        url: url,
+        queryParameters: {
+          format: "json",
+          q: input,
+        },
+      });
+
+      return resource.fetchJson().then(function (results) {
+        var bboxDegrees;
+        return results.map(function (resultObject) {
+          bboxDegrees = resultObject.boundingbox;
+          return {
+            displayName: resultObject.display_name,
+            destination: Cesium.Rectangle.fromDegrees(
+              bboxDegrees[2],
+              bboxDegrees[0],
+              bboxDegrees[3],
+              bboxDegrees[1]
+            ),
+          };
+        });
+      });
+    };
+
+    var viewer = new Cesium.Viewer("cesiumContainer", {
+      geocoder: new OpenStreetMapNominatimGeocoder(),
+      terrainProvider: Cesium.createWorldTerrain(),
+    });
+  </script>
+</body>

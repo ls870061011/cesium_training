@@ -1,0 +1,53 @@
+<!--使用Cesium WorldTerrian图层，该图层由Cesium ion提供，在“My Assets”中是默认提供的-->
+<!DOCTYPE html>
+<head>
+  <title>Hello World</title>
+  <script src="../Build/Cesium/Cesium.js"></script>
+  <link href="../Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    var viewer = new Cesium.Viewer("cesiumContainer", {
+      animation: false, // 动画小组件
+      baseLayerPicker: false, // 底图组件，选择三维数字地球的底图（imagery and terrain）。
+      fullscreenButton: false, // 全屏组件
+      vrButton: false, // VR模式
+      geocoder: false, // 地理编码（搜索）组件
+      homeButton: false, // 首页，点击之后将视图跳转到默认视角
+      infoBox: false, // 信息框
+      sceneModePicker: false, // 场景模式，切换2D、3D 和 Columbus View (CV) 模式。
+      selectionIndicator: false, //是否显示选取指示器组件
+      timeline: false, // 时间轴
+      navigationHelpButton: false, // 帮助提示，如何操作数字地球。
+      navigationInstructionsInitiallyVisible: false, // 如果最初应该看到导航说明，则为true；如果直到用户明确单击该按钮，则该提示不显示，否则为false。
+      terrainExaggeration: 2.0, // 地形夸张
+    });
+
+    // 隐藏logo
+    viewer._cesiumWidget._creditContainer.style.display = "none";
+
+    // Bing地图影像，可以指定mapStyle，详见BingMapsStyle类
+    var terrainProvider = Cesium.createWorldTerrain({
+      requestWaterMask: true, // 请求水体效果所需要的海岸线数据
+      requestVertexNormals: true, // 请求地形照明数据
+    });
+
+    viewer.terrainProvider = terrainProvider;
+
+    // viewer.scene.setTerrainExaggeration(2.0); // 地形夸张
+    viewer.scene.globe.depthTestAgainstTerrain = true; // 启用深度测试，让地形后面的东西消失。
+    viewer.scene.globe.enableLighting = true; // 对大气和雾启用动态照明效果
+  </script>
+</body>

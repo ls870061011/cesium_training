@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<head>
+  <title>Hello World</title>
+  <script src="../Build/Cesium/Cesium.js"></script>
+  <link href="../Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    var viewer = new Cesium.Viewer("cesiumContainer", {
+      terrainProvider: Cesium.createWorldTerrain(),
+    });
+
+    var scene = viewer.scene;
+    var ellipsoid = viewer.scene.globe.ellipsoid;
+
+    //// 鼠标点击屏幕上一点获取该点的经纬度 ////////////////////////////////////////////////////
+    var handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+    handler.setInputAction((event) => {
+      // 1.鼠标点击后的屏幕坐标（像素值）
+      var windowPostion = event.position;
+
+      // 2.二维屏幕坐标转为三维笛卡尔空间直角坐标（世界坐标）
+      var cartesian3 = scene.globe.pick(
+        viewer.camera.getPickRay(windowPostion),
+        scene
+      );
+
+      // 三维笛卡尔空间直角坐标（世界坐标）转为二维屏幕坐标
+      // 结果是Cartesian2对象，取出X,Y即为屏幕坐标。
+      // windowPostion = Cesium.SceneTransforms.wgs84ToWindowCoordinates(
+      //   scene,
+      //   cartesian3
+      // );
+
+      // 3.笛卡尔空间直角坐标系转为地理坐标（弧度制）
+      // var cartographic = Cesium.Cartographic.fromCartesian(cartesian3); // 方法1
+      var cartographic = ellipsoid.cartesianToCartographic(cartesian3); // 方法2
+
+      // 4.地理坐标（弧度制）转为经纬度坐标
+      var lat = Cesium.Math.toDegrees(cartographic.latitude);
+      var lng = Cesium.Math.toDegrees(cartographic.longitude);
+      var height = cartographic.height;
+      console.log(lat + "," + lng + "," + height); //单位：度，度，米
+
+      // 经纬度转弧度
+      // Cesium.Math.toRadians(lat);
+    }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+    ////////////////////////////////////////////////////////////////////////////////////////////
+
+    //// 经纬度坐标转为笛卡尔空间直角坐标系 /////////////////////////////////////////////////////
+    var lng = 116.5,
+      lat = 36.5,
+      height = 10.0;
+    // 方法1：直接转换
+    // var cartesian3 = Cesium.Cartesian3.fromDegrees(lng, lat, height);
+
+    // 方法2：借助ellipsoid对象，先转换成弧度再转换
+    var cartographic = Cesium.Cartographic.fromDegrees(lng, lat, height); //单位：度，度，米
+    var cartesian3 = ellipsoid.cartographicToCartesian(cartographic);
+    console.log(cartesian3.x + "," + cartesian3.y + "," + cartesian3.z); //单位：米，米，米
+    /////////////////////////////////////////////////////////////////////////////////////////////
+
+    // 计算两点之间的距离（pick1、pick3都是三维坐标系下的点）
+    // var distance = Cesium.Cartesian3.distance(
+    //   new Cesium.Cartesian3(pick1.x, pick1.y, pick1.z),
+    //   new Cesium.Cartesian3(pick3.x, pick3.y, pick3.z)
+    // );
+
+    // 问题答案算法
+    var d = 45;
+    var rotate = Cesium.Math.toRadians(d); //转成弧度
+    //quat为围绕这个z轴旋转d度的四元数
+    var quat = Cesium.Quaternion.fromAxisAngle(
+      Cesium.Cartesian3.UNIT_Z,
+      rotate
+    );
+    //rot_mat3为根据四元数求得的旋转矩阵
+    var rot_mat3 = Cesium.Matrix3.fromQuaternion(quat);
+    //已知p1的局部坐标
+    var x1 = 20000,
+      y1 = 40000,
+      z1 = 10000;
+    var v = new Cesium.Cartesian3(x1, y1, z1);
+    // m为旋转加平移的4x4变换矩阵，这里平移为(0,0,0)，故填个Cesium.Cartesian3.ZERO
+    var m = Cesium.Matrix4.fromRotationTranslation(
+      rot_mat3,
+      Cesium.Cartesian3.ZERO
+    );
+    var m1 = Cesium.Matrix4.multiplyByTranslation(m, v, new Cesium.Matrix4()); // m1 = m X v  将结果存储在m1中
+
+    // 得到局部坐标原点的全局坐标，即三位笛卡尔坐标（世界坐标）
+    var lng = 117,
+      lat = 37,
+      height = 10;
+    var cart3 = ellipsoid.cartographicToCartesian(
+      Cesium.Cartographic.fromDegrees(lng, lat, height)
+    );
+    // m2为局部坐标的z轴垂直于地表，局部坐标的y轴指向正北的4x4变换矩阵
+    var m2 = Cesium.Transforms.eastNorthUpToFixedFrame(cart3);
+
+    // m3 = m1 X m2  将结果存储到m3中
+    var m3 = Cesium.Matrix4.multiplyTransformation(
+      m1,
+      m2,
+      new Cesium.Matrix4()
+    );
+    var p2 = Cesium.Matrix4.getTranslation(m3, new Cesium.Cartesian3()); // 根据最终变换矩阵m3得到p2
+    console.log("x=" + p2.x + ",y=" + p2.y + ",z=" + p2.z);
+  </script>
+</body>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<head>
+  <title>Hello World</title>
+  <script src="../Build/Cesium/Cesium.js"></script>
+  <link href="../Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    var viewer = new Cesium.Viewer("cesiumContainer", {
+      infoBox: true, // 信息框
+      selectionIndicator: true, //是否显示选取指示器组件
+      shouldAnimate: true,
+    });
+
+    var point = viewer.entities.add({
+      position: Cesium.Cartesian3.fromDegrees(-105.0, 41, 50010),
+      point: {
+        show: true,
+        pixelSize: 10, // 像素大小
+      },
+    });
+
+    var polygon = viewer.entities.add({
+      id: "entity_1",
+      name: "Green extruded polygon",
+      description: "这是一个多边形体块",
+      polygon: {
+        hierarchy: Cesium.Cartesian3.fromDegreesArray([
+          -108.0,
+          42.0,
+          -100.0,
+          42.0,
+          -104.0,
+          40.0,
+        ]),
+        extrudedHeight: 50000.0,
+        material: Cesium.Color.GREEN,
+      },
+    });
+    viewer.zoomTo(viewer.entities);
+
+    // var entity = viewer.entities.getById("entity_1");
+    // viewer.entities.remove(entity);
+    // viewer.entities.removeById("entity_1");
+    // viewer.entities.removeAll();
+
+    // 添加拾取事件
+    var handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
+    handler.setInputAction(function (movement) {
+      var pickedEntity = pickEntity(viewer, movement.position);
+      console.log(pickedEntity);
+
+      var pickedEntities = drillPickEntities(viewer, movement.position);
+      console.log(pickedEntities);
+    }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+    /**
+     * Returns the top-most entity at the provided window coordinates
+     * or undefined if no entity is at that location.
+     *
+     * @param {Cartesian2} windowPosition The window coordinates.
+     * @returns {Entity} The picked entity or undefined.
+     */
+    function pickEntity(viewer, windowPosition) {
+      var picked = viewer.scene.pick(windowPosition);
+      if (Cesium.defined(picked)) {
+        var id = Cesium.defaultValue(picked.id, picked.primitive.id);
+        if (id instanceof Cesium.Entity) {
+          return id;
+        }
+      }
+      return undefined;
+    }
+
+    /**
+     * Returns the list of entities at the provided window coordinates.
+     * The entities are sorted front to back by their visual order.
+     *
+     * @param {Cartesian2} windowPosition The window coordinates.
+     * @returns {Entity[]} The picked entities or undefined.
+     */
+    function drillPickEntities(viewer, windowPosition) {
+      var i;
+      var entity;
+      var picked;
+      var pickedPrimitives = viewer.scene.drillPick(windowPosition);
+      var length = pickedPrimitives.length;
+      var result = [];
+      var hash = {};
+
+      for (i = 0; i < length; i++) {
+        picked = pickedPrimitives[i];
+        entity = Cesium.defaultValue(picked.id, picked.primitive.id);
+        if (
+          entity instanceof Cesium.Entity &&
+          !Cesium.defined(hash[entity.id])
+        ) {
+          result.push(entity);
+          hash[entity.id] = true;
+        }
+      }
+      return result;
+    }
+  </script>
+</body>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<head>
+  <title>Hello World</title>
+  <script src="../Build/Cesium/Cesium.js"></script>
+  <link href="../Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    var viewer = new Cesium.Viewer("cesiumContainer");
+
+    // // 需要回调的函数
+    // function callbackFunc(event) {
+    //   cosnole.log(event);
+    // }
+
+    // // 注册事件
+    // // 相机开始移动处理事件
+    // viewer.scene.camera.moveStart.addEventListender(callbackFunc);
+    // // 相机停止移动处理事件
+    // viewer.scene.camera.moveEnd.addEventListender(callbackFunc);
+
+    // // 注销事件
+    // // 相机开始移动处理事件
+    // viewer.scene.camera.moveStart.removeEventListender(callbackFunc);
+    // // 相机停止移动处理事件
+    // viewer.scene.camera.moveEnd.removeEventListender(callbackFunc);
+
+    // 设置中健缩放、右键旋转
+    viewer.scene.screenSpaceCameraController.tiltEventTypes = [
+      Cesium.CameraEventType.RIGHT_DRAG,
+      Cesium.CameraEventType.PINCH,
+      {
+        eventType: Cesium.CameraEventType.LEFT_DRAG,
+        modifier: Cesium.KeyboardEventModifier.CTRL,
+      },
+      {
+        eventType: Cesium.CameraEventType.RIGHT_DRAG,
+        modifier: Cesium.KeyboardEventModifier.CTRL,
+      },
+    ];
+
+    viewer.scene.screenSpaceCameraController.zoomEventTypes = [
+      Cesium.CameraEventType.MIDDLE_DRAG,
+      Cesium.CameraEventType.WHEEL,
+      Cesium.CameraEventType.PINCH,
+    ];
+  </script>
+</body>

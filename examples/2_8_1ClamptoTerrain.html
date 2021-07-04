@@ -1,0 +1,144 @@
+<!--支持从VT MAK VR-TheWorld Server服务器请求的高度地图地形图。-->
+<!DOCTYPE html>
+<head>
+  <title>Hello World</title>
+  <script src="../Build/Cesium/Cesium.js"></script>
+  <link href="../Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    var viewer = new Cesium.Viewer("cesiumContainer", {
+      terrainProvider: Cesium.createWorldTerrain(),
+    });
+    viewer.scene.globe.depthTestAgainstTerrain = true;
+
+    // set the heightReference to CLAMP_TO_GROUND
+    // billboard box corridor cylinder ellipse ellipsoid label model point polygon tectangle
+    // 其中corridor ellipse polygon retangle会自动贴地
+    viewer.entities.add({
+      position: Cesium.Cartesian3.fromDegrees(-122.1958, 46.1915),
+      billboard: {
+        image: "./images/facility.gif",
+        heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+      },
+      point: {
+        color: Cesium.Color.SKYBLUE,
+        pixelSize: 10,
+        heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+      },
+      label: {
+        text: "Clamped to ground",
+        font: "14pt sans-serif",
+        heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+        horizontalOrigin: Cesium.HorizontalOrigin.LEFT,
+        verticalOrigin: Cesium.VerticalOrigin.BASELINE,
+        fillColor: Cesium.Color.BLACK,
+        showBackground: true,
+        backgroundColor: new Cesium.Color(1, 1, 1, 0.7),
+        backgroundPadding: new Cesium.Cartesian2(8, 4),
+        disableDepthTestDistance: Number.POSITIVE_INFINITY, // draws the label in front of terrain
+      },
+    });
+    viewer.entities.add({
+      position: Cesium.Cartesian3.fromDegrees(-122.1958, 46.1915),
+      model: {
+        uri: "./data/models/CesiumMan/Cesium_Man.glb",
+        heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+        minimumPixelSize: 128,
+        maximumScale: 100,
+      },
+    });
+
+    // corridors、ellipse、 polygons and rectangles will be clamped automatically 
+    // if they are filled with a constant color and  has no height or extruded height.
+    viewer.entities.add({
+      position: Cesium.Cartesian3.fromDegrees(-122.195, 46.1915),
+      corridor: {
+        positions: Cesium.Cartesian3.fromDegreesArray([
+          -122.19,
+          46.1914,
+          -122.2,
+          46.1924,
+          -122.21,
+          46.193,
+        ]),
+        width: 500.0,
+        material: Cesium.Color.GREEN.withAlpha(0.5),
+      },
+      ellipse: {
+        semiMajorAxis: 300.0, // 长半轴距离
+        semiMinorAxis: 150.0, // 短半轴距离
+        // heightReference: Cesium.HeightReference.NONE,
+        material: Cesium.Color.BLUE.withAlpha(0.5),
+        // material: "./images/Cesium_Logo_Color.jpg",
+        // classificationType: Cesium.ClassificationType.BOTH,
+      },
+      polygon: {
+        hierarchy: {
+          positions: [
+            new Cesium.Cartesian3(
+              -2358138.847340281,
+              -3744072.459541374,
+              4581158.5714175375
+            ),
+            new Cesium.Cartesian3(
+              -2357231.4925370603,
+              -3745103.7886602185,
+              4580702.9757762635
+            ),
+            new Cesium.Cartesian3(
+              -2355912.902205431,
+              -3744249.029778454,
+              4582402.154378103
+            ),
+            new Cesium.Cartesian3(
+              -2357208.0209552636,
+              -3743553.4420488174,
+              4581961.863286629
+            ),
+          ],
+        },
+        // material: Cesium.Color.BLUE.withAlpha(0.5),
+        material: "./images/Cesium_Logo_Color.jpg",
+      },
+      rectangle: {
+        coordinates: Cesium.Rectangle.fromDegrees(-122.2, 46.2, -122.1, 46.3),
+        material: Cesium.Color.RED.withAlpha(0.5),
+      },
+    });
+
+    // set the classificationType to TERRAIN
+    // corridor ellipse polygon polyline rectangle
+    // 其中polyline 必须 设置clampToGround = true
+    viewer.entities.add({
+      polyline: {
+        positions: Cesium.Cartesian3.fromDegreesArray([
+          -122.1968,
+          46.1915,
+          -122.1968,
+          46.2015,
+          -122.1968,
+          46.2015,
+        ]),
+        clampToGround: true,
+        width: 5,
+        material: Cesium.Color.ORANGE,
+        depthFailMaterial: Cesium.Color.RED,
+        // classificationType: Cesium.ClassificationType.BOTH,
+      },
+    });
+    viewer.zoomTo(viewer.entities);
+  </script>
+</body>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<head>
+  <title>Hello World</title>
+  <script src="../Build/Cesium/Cesium.js"></script>
+  <link href="../Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    var viewer = new Cesium.Viewer("cesiumContainer", {
+      animation: false, // 动画小组件
+      baseLayerPicker: false, // 底图组件，选择三维数字地球的底图（imagery and terrain）。
+      fullscreenButton: false, // 全屏组件
+      vrButton: false, // VR模式
+      geocoder: false, // 地理编码（搜索）组件
+      homeButton: false, // 首页，点击之后将视图跳转到默认视角
+      infoBox: false, // 信息框
+      sceneModePicker: false, // 场景模式，切换2D、3D 和 Columbus View (CV) 模式。
+      selectionIndicator: false, //是否显示选取指示器组件
+      timeline: false, // 时间轴
+      navigationHelpButton: false, // 帮助提示，如何操作数字地球。
+      navigationInstructionsInitiallyVisible: false, // 如果最初应该看到导航说明，则为true；如果直到用户明确单击该按钮，则该提示不显示，否则为false。
+      shouldAnimate: true,
+    });
+
+    // 隐藏logo
+    viewer._cesiumWidget._creditContainer.style.display = "none";
+
+    var entity = viewer.entities.add({
+      name: "Spheres and Ellipsoids",
+      position: Cesium.Cartesian3.fromDegrees(-100.0, 40.0, 300000.0),
+      ellipsoid: {
+        show: true,
+        radii: new Cesium.Cartesian3(200000.0, 200000.0, 300000.0), // 椭球半径
+        // innerRadii: new Cesium.Cartesian3(0.0, 0.0, 0.0), // 椭球内部半径
+        minimumClock: 0.0, // 最小时钟角度
+        maximumClock: 2 * Math.PI, // 最大时钟角度
+        minimumCone: 0.0, // 最小圆锥角
+        maximumCone: Math.PI, // 最大圆锥角
+        heightReference: Cesium.HeightReference.NONE,
+        fill: true,
+        material: Cesium.Color.BLUE.withAlpha(0.5),
+        outline: true,
+        outlineColor: Cesium.Color.YELLOW,
+        outlineWidth: 1.0,
+
+        stackPartitions: 64, // 延纬度线切割的次数
+        slicePartitions: 64, // 延经度线切割的次数
+        subdivisions: 128, // 每个轮廓环的样本数，确定曲率的粒度
+
+        shadows: Cesium.ShadowMode.DISABLED,
+        // distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
+        //   1.0e3,
+        //   2.0e3
+        // ),
+      },
+    });
+
+    viewer.zoomTo(viewer.entities);
+  </script>
+</body>

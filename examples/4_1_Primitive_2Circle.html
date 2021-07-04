@@ -1,0 +1,120 @@
+<!--支持从VT MAK VR-TheWorld Server服务器请求的高度地图地形图。-->
+<!DOCTYPE html>
+<head>
+  <title>Hello World</title>
+  <script src="../Build/Cesium/Cesium.js"></script>
+  <link href="../Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    var viewer = new Cesium.Viewer("cesiumContainer");
+
+    // 创建circle几何
+    var circleGeometry = new Cesium.CircleGeometry({
+      center: Cesium.Cartesian3.fromDegrees(-75, 40), // 圆的中心点
+
+      radius: 100000.0, // 圆的半径
+
+      // 圆所在的椭球体
+      ellipsoid: Cesium.Ellipsoid.WGS84,
+
+      height: 0.0,
+
+      granularity: 0.02, // 圆弧上的点之间的弧度角
+
+      vertexFormat: Cesium.PerInstanceColorAppearance.VERTEX_FORMAT, // 要计算的顶点属性
+
+      extrudedHeight: 0.0,
+
+      stRotation: 0.0, // 纹理的旋转坐标（以弧度为单位）。正旋转是逆时针方向
+    });
+
+    // 创建Circle的几何实例
+    var circleInstance = new Cesium.GeometryInstance({
+      geometry: circleGeometry,
+      // modelMatrix: Cesium.Matrix4.multiplyByTranslation(
+      //   Cesium.Transforms.eastNorthUpToFixedFrame(
+      //     Cesium.Cartesian3.fromDegrees(-75, 40)
+      //   ),
+      //   new Cesium.Cartesian3(0.0, 0.0, 0.0),
+      //   new Cesium.Matrix4()
+      // ),
+      id: "circle",
+      attributes: {
+        color: Cesium.ColorGeometryInstanceAttribute.fromColor(
+          Cesium.Color.BLUE
+        ),
+        show: new Cesium.ShowGeometryInstanceAttribute(true), //显示或者隐藏
+      },
+    });
+
+    viewer.scene.primitives.add(
+      new Cesium.Primitive({
+        geometryInstances: circleInstance,
+        appearance: new Cesium.PerInstanceColorAppearance({
+          translucent: false,
+          closed: false,
+        }),
+      })
+    );
+
+    // 创建circleOutline几何
+    var circleOutlineGeometry = new Cesium.CircleOutlineGeometry({
+      center: Cesium.Cartesian3.fromDegrees(-70, 45), // 圆的中心点
+
+      radius: 100000.0, // 圆的半径
+
+      // 圆所在的椭球体
+      ellipsoid: Cesium.Ellipsoid.WGS84,
+
+      height: 0.0,
+
+      granularity: 0.02, // 圆弧上的点之间的弧度角
+
+      extrudedHeight: 0.0,
+
+      numberOfVerticalLines: 16, // 圆拉伸后顶部和底部之间线条的个数
+    });
+
+    // 创建CircleOutline的几何实例
+    var circleOutlineInstance = new Cesium.GeometryInstance({
+      geometry: circleOutlineGeometry,
+      // modelMatrix: Cesium.Matrix4.multiplyByTranslation(
+      //   Cesium.Transforms.eastNorthUpToFixedFrame(
+      //     Cesium.Cartesian3.fromDegrees(-72, 40)
+      //   ),
+      //   new Cesium.Cartesian3(0.0, 0.0, 1000.0),
+      //   new Cesium.Matrix4()
+      // ),
+      id: "circleOutline",
+      attributes: {
+        color: Cesium.ColorGeometryInstanceAttribute.fromColor(
+          Cesium.Color.RED
+        ),
+        // show: new Cesium.ShowGeometryInstanceAttribute(true), //显示或者隐藏
+      },
+    });
+
+    viewer.scene.primitives.add(
+      new Cesium.Primitive({
+        geometryInstances: circleOutlineInstance,
+        appearance: new Cesium.PerInstanceColorAppearance({
+          translucent: false,
+          closed: false,
+        }),
+      })
+    );
+  </script>
+</body>

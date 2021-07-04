@@ -1,0 +1,101 @@
+<!--支持从VT MAK VR-TheWorld Server服务器请求的高度地图地形图。-->
+<!DOCTYPE html>
+<head>
+  <title>Hello World</title>
+  <script src="../Build/Cesium/Cesium.js"></script>
+  <link href="../Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    var viewer = new Cesium.Viewer("cesiumContainer", {
+      animation: false, // 动画小组件
+      baseLayerPicker: false, // 底图组件，选择三维数字地球的底图（imagery and terrain）。
+      fullscreenButton: false, // 全屏组件
+      vrButton: false, // VR模式
+      geocoder: false, // 地理编码（搜索）组件
+      homeButton: false, // 首页，点击之后将视图跳转到默认视角
+      infoBox: false, // 信息框
+      sceneModePicker: false, // 场景模式，切换2D、3D 和 Columbus View (CV) 模式。
+      selectionIndicator: false, //是否显示选取指示器组件
+      timeline: false, // 时间轴
+      navigationHelpButton: false, // 帮助提示，如何操作数字地球。
+      navigationInstructionsInitiallyVisible: false, // 如果最初应该看到导航说明，则为true；如果直到用户明确单击该按钮，则该提示不显示，否则为false。
+      shouldAnimate: true,
+    });
+
+    // 隐藏logo
+    viewer._cesiumWidget._creditContainer.style.display = "none";
+
+    function createModel(url, x, y, height) {
+      var position = Cesium.Cartesian3.fromDegrees(x, y, height);
+      viewer.entities.add({
+        name: url,
+        position: position,
+        model: {
+          uri: url,
+        },
+      });
+    }
+
+    var numberOfBalloons = 13;
+    var lonIncrement = 0.00025;
+    var initialLon = -122.99875;
+    var lat = 44.0503706;
+    var height = 100.0;
+
+    var url = "./data/models/CesiumBalloon/CesiumBalloon.glb";
+
+    for (var i = 0; i < numberOfBalloons; ++i) {
+      var lon = initialLon + i * lonIncrement;
+      createModel(url, lon, lat, height);
+    }
+
+    var viewModel = {
+      show: true,
+      glowOnly: false,
+      contrast: 128,
+      brightness: -0.3,
+      delta: 1.0,
+      sigma: 3.78,
+      stepSize: 5.0,
+    };
+
+    Cesium.knockout.track(viewModel);
+
+    function updatePostProcess() {
+      var bloom = viewer.scene.postProcessStages.bloom;
+      bloom.enabled = Boolean(viewModel.show);
+      bloom.uniforms.glowOnly = Boolean(viewModel.glowOnly);
+      bloom.uniforms.contrast = Number(viewModel.contrast);
+      bloom.uniforms.brightness = Number(viewModel.brightness);
+      bloom.uniforms.delta = Number(viewModel.delta);
+      bloom.uniforms.sigma = Number(viewModel.sigma);
+      bloom.uniforms.stepSize = Number(viewModel.stepSize);
+    }
+    updatePostProcess();
+
+    var target = Cesium.Cartesian3.fromDegrees(
+      initialLon + lonIncrement,
+      lat,
+      height + 7.5
+    );
+    var offset = new Cesium.Cartesian3(
+      -37.048378684557974,
+      -24.852967044804245,
+      4.352023653686047
+    );
+    viewer.scene.camera.lookAt(target, offset);
+  </script>
+</body>

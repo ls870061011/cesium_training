@@ -1,0 +1,73 @@
+<!--支持从VT MAK VR-TheWorld Server服务器请求的高度地图地形图。-->
+<!DOCTYPE html>
+<head>
+  <title>Hello World</title>
+  <script src="../Build/Cesium/Cesium.js"></script>
+  <link href="../Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    var viewer = new Cesium.Viewer("cesiumContainer", {
+      terrainProvider: Cesium.createWorldTerrain(),
+    });
+    var scene = viewer.scene;
+    var clock = viewer.clock;
+
+    var entity;
+    var positionProperty;
+    var dataSourcePromise = Cesium.CzmlDataSource.load(
+      "./data/ClampToGround.czml"
+    );
+    viewer.dataSources.add(dataSourcePromise).then(function (dataSource) {
+      entity = dataSource.entities.getById("CesiumMilkTruck");
+      positionProperty = entity.position;
+    });
+
+    var tileset = scene.primitives.add(
+      new Cesium.Cesium3DTileset({
+        url: Cesium.IonResource.fromAssetId(40866),
+      })
+    );
+
+    viewer.camera.setView({
+      destination: new Cesium.Cartesian3(
+        1216403.8845586285,
+        -4736357.493351395,
+        4081299.715698949
+      ),
+      orientation: new Cesium.HeadingPitchRoll(
+        4.2892217081808806,
+        -0.4799070147502502,
+        6.279789177843313
+      ),
+      endTransform: Cesium.Matrix4.IDENTITY,
+    });
+
+    if (scene.clampToHeightSupported) {
+      tileset.initialTilesLoaded.addEventListener(start);
+    } else {
+      window.alert("This browser does not support clampToHeight.");
+    }
+
+    function start() {
+      clock.shouldAnimate = true;
+      var objectsToExclude = [entity];
+      scene.postRender.addEventListener(function () {
+        var position = positionProperty.getValue(clock.currentTime);
+        entity.position = scene.clampToHeight(position, objectsToExclude);
+      });
+    }
+  </script>
+</body>

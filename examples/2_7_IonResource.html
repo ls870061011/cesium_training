@@ -1,0 +1,57 @@
+<!--支持从VT MAK VR-TheWorld Server服务器请求的高度地图地形图。-->
+<!DOCTYPE html>
+<head>
+  <title>Hello World</title>
+  <script src="../Build/Cesium/Cesium.js"></script>
+  <link href="../Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    var styles = [
+      Cesium.IonWorldImageryStyle.AERIAL, // 航空影像
+      Cesium.IonWorldImageryStyle.AERIAL_WITH_LABELS, // 带有道路覆盖物的航空影像
+      Cesium.IonWorldImageryStyle.ROAD, // 没有其他图像的道路
+    ];
+
+    var viewer = new Cesium.Viewer("cesiumContainer", {
+      // 在线地形
+      terrainProvider: Cesium.createWorldTerrain(),
+      // terrainProvider: new Cesium.CesiumTerrainProvider({
+      //   url: Cesium.IonResource.fromAssetId(3956),
+      // }),
+
+      // 在线影像  default:IonWorldImageryStyle
+      imageryProvider: Cesium.createWorldImagery({
+        style: styles[2],
+      }),
+      // imageryProvider: new Cesium.IonImageryProvider({ assetId: 3845 }),
+    });
+
+    // 在线OSM
+    viewer.scene.primitives.add(Cesium.createOsmBuildings());
+
+    // 在线3DTiles-点云
+    var tileset = viewer.scene.primitives.add(
+      new Cesium.Cesium3DTileset({
+        url: Cesium.IonResource.fromAssetId(28945),
+        pointCloudShading: {
+          attenuation: true,
+          maximumAttenuation: 2,
+        },
+      })
+    );
+    viewer.zoomTo(tileset);
+  </script>
+</body>

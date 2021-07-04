@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<head>
+  <title>Hello World</title>
+  <script src="../Build/Cesium/Cesium.js"></script>
+  <link href="../Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    #mouse_state {
+      position: absolute;
+      bottom: 0;
+      left: 20px;
+      height: 20px;
+      width: 500px;
+      color: #fff;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <div id="mouse_state"></div>
+  <script>
+    var viewer = new Cesium.Viewer("cesiumContainer", {
+      animation: false, // 动画小组件
+      baseLayerPicker: true, // 底图组件，选择三维数字地球的底图（imagery and terrain）。
+      fullscreenButton: false, // 全屏组件
+      vrButton: false, // VR模式
+      geocoder: false, // 地理编码（搜索）组件
+      homeButton: true, // 首页，点击之后将视图跳转到默认视角
+      infoBox: false, // 信息框
+      sceneModePicker: false, // 场景模式，切换2D、3D 和 Columbus View (CV) 模式。
+      selectionIndicator: false, //是否显示选取指示器组件
+      timeline: false, // 时间轴
+      navigationHelpButton: false, // 帮助提示，如何操作数字地球。
+      navigationInstructionsInitiallyVisible: false, // 如果最初应该看到导航说明，则为true；如果直到用户明确单击该按钮，则该提示不显示，否则为false。
+    });
+
+    // 隐藏logo
+    viewer._cesiumWidget._creditContainer.style.display = "none";
+
+    // var mouse_state = document.getElementById("mouse_state");
+    // var handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+    // var ellipsoid = viewer.scene.globe.ellipsoid;
+    // handler.setInputAction(function (movement) {
+    //   //通过指定的椭球或者地图对应的坐标系，将鼠标的二维坐标转换为对应椭球体三维坐标
+    //   cartesian = viewer.camera.pickEllipsoid(movement.endPosition, ellipsoid);
+    //   if (cartesian) {
+    //     //将笛卡尔坐标转换为地理坐标
+    //     var cartographic = ellipsoid.cartesianToCartographic(cartesian);
+    //     //将弧度转为度的十进制度表示
+    //     longitudeString = Cesium.Math.toDegrees(cartographic.longitude).toFixed(
+    //       3
+    //     );
+    //     latitudeString = Cesium.Math.toDegrees(cartographic.latitude).toFixed(
+    //       3
+    //     );
+    //     //获取相机高度
+    //     height = Math.ceil(viewer.camera.positionCartographic.height).toFixed(
+    //       3
+    //     );
+    //     mouse_state.innerText =
+    //       "移动：(" +
+    //       longitudeString +
+    //       ", " +
+    //       latitudeString +
+    //       "," +
+    //       height +
+    //       ")";
+    //   } else {
+    //     mouse_state.innerText = "";
+    //   }
+    // }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+
+    // //取消双击事件
+    // viewer.cesiumWidget.screenSpaceEventHandler.removeInputAction(
+    //   Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK
+    // );
+
+    // 添加point Entity
+    viewer.entities.add({
+      position: Cesium.Cartesian3.fromDegrees(-97.5, 21.5),
+      point: {
+        pixelSize: 10, // 像素大小
+      },
+    });
+
+    // 添加polygon Entity
+    viewer.entities.add({
+      id: "entity_1",
+      name: "rectangle",
+      description: "这是一个矩形",
+      rectangle: {
+        coordinates: Cesium.Rectangle.fromDegrees(-100.0, 20.0, -97.5, 22.0),
+        material: Cesium.Color.GREEN,
+      },
+    });
+    viewer.zoomTo(viewer.entities);
+
+    // 添加polygon Primitive
+    var instance = new Cesium.GeometryInstance({
+      geometry: new Cesium.RectangleGeometry({
+        rectangle: Cesium.Rectangle.fromDegrees(-97.5, 20.0, -95.0, 22.0),
+        vertexFormat: Cesium.EllipsoidSurfaceAppearance.VERTEX_FORMAT,
+      }),
+      id: "rectangle-1",
+    });
+    viewer.scene.primitives.add(
+      new Cesium.Primitive({
+        geometryInstances: instance,
+        appearance: new Cesium.EllipsoidSurfaceAppearance({
+          material: Cesium.Material.fromType("Stripe"),
+        }),
+      })
+    );
+
+    // 加载gltf
+    var origin = Cesium.Cartesian3.fromDegrees(-97.5, 21.0, 0);
+    // 创建一个本地的东北向上坐标系，其原点为经度-97.5度，纬度21.0度。
+    // 可以随时更改模型的modelMatrix属性以移动模型。
+    var modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(origin);
+    var model = viewer.scene.primitives.add(
+      Cesium.Model.fromGltf({
+        url: "./data/models/DracoCompressed/CesiumMilkTruck.gltf",
+        modelMatrix: modelMatrix,
+        minimumPixelSize: 128,
+        maximumScale: 20000,
+      })
+    );
+
+    // 添加3D Tiles
+    var tileset = viewer.scene.primitives.add(
+      new Cesium.Cesium3DTileset({
+        url: "./data/Cesium3DTiles/Tilesets/Tileset/tileset.json",
+        modelMatrix: modelMatrix,
+      })
+    );
+    // viewer.zoomTo(tileset);
+
+    var handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
+    let eventType = Cesium.ScreenSpaceEventType.LEFT_CLICK;
+    //注册事件
+    // handler.setInputAction((event) => {
+    //   console.log(event);
+    // }, eventType);
+
+    //注销事件
+    // handler.removeInputAction(eventType);
+
+    handler.setInputAction((event) => {
+      var picked = viewer.scene.pick(event.position);
+      // var pickeds = viewer.scene.drillPick(event.position);
+      // console.log(pickeds);
+      if (Cesium.defined(picked)) {
+        if (picked.id && picked.id instanceof Cesium.Entity) {
+          console.log("选中了Entity");
+        }
+        if (picked.primitive instanceof Cesium.Primitive) {
+          console.log("选中了Primitive");
+        }
+        if (picked.primitive instanceof Cesium.Model) {
+          console.log("选中了模型");
+        }
+        if (picked instanceof Cesium.Cesium3DTileFeature) {
+          console.log("选中了3DTile");
+        }
+      }
+    }, eventType);
+  </script>
+</body>

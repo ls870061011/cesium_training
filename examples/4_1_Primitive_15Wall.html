@@ -1,0 +1,213 @@
+<!--支持从VT MAK VR-TheWorld Server服务器请求的高度地图地形图。-->
+<!DOCTYPE html>
+<head>
+  <title>Hello World</title>
+  <script src="../Build/Cesium/Cesium.js"></script>
+  <link href="../Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    var viewer = new Cesium.Viewer("cesiumContainer");
+
+    var array = [
+      19.0,
+      47.0,
+      10000.0,
+      19.0,
+      48.0,
+      10000.0,
+      20.0,
+      48.0,
+      10000.0,
+      20.0,
+      47.0,
+      10000.0,
+      19.0,
+      47.0,
+      10000.0,
+    ];
+
+    var wall = new Cesium.WallGeometry({
+      positions: Cesium.Cartesian3.fromDegreesArray([
+        -115.0,
+        50.0,
+        -112.5,
+        50.0,
+        -110.0,
+        50.0,
+        -107.5,
+        50.0,
+        -105.0,
+        50.0,
+        -102.5,
+        50.0,
+        -100.0,
+        50.0,
+        -97.5,
+        50.0,
+        -95.0,
+        50.0,
+        -92.5,
+        50.0,
+        -90.0,
+        50.0,
+      ]),
+      granularity: Cesium.Math.RADIANS_PER_DEGREE,
+      // 一种与位置平行的数组，在位置处给出墙的最大高度。如果未定义，则使用每个位置的高度。
+      maximumHeights: [
+        100000,
+        200000,
+        100000,
+        200000,
+        100000,
+        200000,
+        100000,
+        200000,
+        100000,
+        200000,
+        100000,
+      ],
+      // 一种与位置平行的数组，用于指定位置处的墙的最小高度。如果未定义，则每个位置的高度为0.0
+      minimumHeights: [
+        0,
+        100000,
+        0,
+        100000,
+        0,
+        100000,
+        0,
+        100000,
+        0,
+        100000,
+        0,
+      ],
+      ellipsoid: Cesium.Ellipsoid.WGS84,
+      vertexFormat: Cesium.PerInstanceColorAppearance.VERTEX_FORMAT,
+    });
+
+    var wallInstance = new Cesium.GeometryInstance({
+      geometry: wall,
+      // modelMatrix: Cesium.Matrix4.multiplyByTranslation(
+      //   Cesium.Transforms.eastNorthUpToFixedFrame(
+      //     Cesium.Cartesian3.fromDegrees(-75, 40, 100000)
+      //   ),
+      //   new Cesium.Cartesian3(0.0, 0.0, 0.0),
+      //   new Cesium.Matrix4()
+      // ),
+      id: "wall",
+      attributes: {
+        color: Cesium.ColorGeometryInstanceAttribute.fromColor(
+          Cesium.Color.BLUE
+        ),
+        show: new Cesium.ShowGeometryInstanceAttribute(true), //显示或者隐藏
+      },
+    });
+
+    viewer.scene.primitives.add(
+      new Cesium.Primitive({
+        geometryInstances: wallInstance,
+        appearance: new Cesium.PerInstanceColorAppearance({
+          translucent: false,
+          closed: false,
+        }),
+      })
+    );
+
+    var wallOutline = new Cesium.WallOutlineGeometry({
+      positions: Cesium.Cartesian3.fromDegreesArray([
+        -115.0,
+        50.0,
+        -112.5,
+        50.0,
+        -110.0,
+        50.0,
+        -107.5,
+        50.0,
+        -105.0,
+        50.0,
+        -102.5,
+        50.0,
+        -100.0,
+        50.0,
+        -97.5,
+        50.0,
+        -95.0,
+        50.0,
+        -92.5,
+        50.0,
+        -90.0,
+        50.0,
+      ]),
+      granularity: Cesium.Math.RADIANS_PER_DEGREE,
+      // 一种与位置平行的数组，在位置处给出墙的最大高度。如果未定义，则使用每个位置的高度。
+      maximumHeights: [
+        100000,
+        200000,
+        100000,
+        200000,
+        100000,
+        200000,
+        100000,
+        200000,
+        100000,
+        200000,
+        100000,
+      ],
+      // 一种与位置平行的数组，用于指定位置处的墙的最小高度。如果未定义，则每个位置的高度为0.0
+      minimumHeights: [
+        0,
+        100000,
+        0,
+        100000,
+        0,
+        100000,
+        0,
+        100000,
+        0,
+        100000,
+        0,
+      ],
+      ellipsoid: Cesium.Ellipsoid.WGS84,
+    });
+
+    var wallOutlineInstance = new Cesium.GeometryInstance({
+      geometry: wallOutline,
+      // modelMatrix: Cesium.Matrix4.multiplyByTranslation(
+      //   Cesium.Transforms.eastNorthUpToFixedFrame(
+      //     Cesium.Cartesian3.fromDegrees(-75, 40, 100000)
+      //   ),
+      //   new Cesium.Cartesian3(0.0, 0.0, 0.0),
+      //   new Cesium.Matrix4()
+      // ),
+      id: "wallOutline",
+      attributes: {
+        color: Cesium.ColorGeometryInstanceAttribute.fromColor(
+          Cesium.Color.RED
+        ),
+        show: new Cesium.ShowGeometryInstanceAttribute(true), //显示或者隐藏
+      },
+    });
+
+    viewer.scene.primitives.add(
+      new Cesium.Primitive({
+        geometryInstances: wallOutlineInstance,
+        appearance: new Cesium.PerInstanceColorAppearance({
+          translucent: false,
+          closed: false,
+        }),
+      })
+    );
+  </script>
+</body>

@@ -1,0 +1,130 @@
+<!--支持从VT MAK VR-TheWorld Server服务器请求的高度地图地形图。-->
+<!DOCTYPE html>
+<head>
+  <title>Hello World</title>
+  <script src="../Build/Cesium/Cesium.js"></script>
+  <link href="../Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    var viewer = new Cesium.Viewer("cesiumContainer");
+
+    function computeCircle(radius) {
+      var positions = [];
+      for (var i = 0; i < 360; i++) {
+        var radians = Cesium.Math.toRadians(i);
+        positions.push(
+          new Cesium.Cartesian2(
+            radius * Math.cos(radians),
+            radius * Math.sin(radians)
+          )
+        );
+      }
+      return positions;
+    }
+
+    var polylineVolume = new Cesium.PolylineVolumeGeometry({
+      // 定义折线体中心的笛卡尔坐标数组
+      polylinePositions: Cesium.Cartesian3.fromDegreesArray([
+        -85.0,
+        32.0,
+        -85.0,
+        36.0,
+        -89.0,
+        36.0,
+      ]),
+      shapePositions: computeCircle(60000.0), // 定义要沿折线拉伸形状的笛卡尔坐标数组
+      ellipsoid: Cesium.Ellipsoid.WGS84,
+      granularity: Cesium.Math.RADIANS_PER_DEGREE, // 每一纬度和经度之间的距离，以弧度表示。确定缓冲区中的位置数
+      vertexFormat: Cesium.PerInstanceColorAppearance.VERTEX_FORMAT,
+      // ROUNDED	拐角有光滑的边缘;MITERED 拐角点是相邻边的交点;BEVELED	拐角被修剪。
+      cornerType: Cesium.CornerType.ROUNDED,
+    });
+
+    var polylineVolumeInstance = new Cesium.GeometryInstance({
+      geometry: polylineVolume,
+      // modelMatrix: Cesium.Matrix4.multiplyByTranslation(
+      //   Cesium.Transforms.eastNorthUpToFixedFrame(
+      //     Cesium.Cartesian3.fromDegrees(-65, 40)
+      //   ),
+      //   new Cesium.Cartesian3(0.0, 0.0, 10.0),
+      //   new Cesium.Matrix4()
+      // ),
+      id: "polylineVolume",
+      attributes: {
+        color: Cesium.ColorGeometryInstanceAttribute.fromColor(
+          Cesium.Color.BLUE
+        ),
+        show: new Cesium.ShowGeometryInstanceAttribute(true), //显示或者隐藏
+      },
+    });
+
+    viewer.scene.primitives.add(
+      new Cesium.Primitive({
+        geometryInstances: polylineVolumeInstance,
+        appearance: new Cesium.PerInstanceColorAppearance({
+          translucent: false,
+          closed: false,
+        }),
+      })
+    );
+
+    var polylineVolumeOutline = new Cesium.PolylineVolumeOutlineGeometry({
+      // 定义折线体中心的笛卡尔坐标数组
+      polylinePositions: Cesium.Cartesian3.fromDegreesArray([
+        -85.0,
+        32.0,
+        -85.0,
+        36.0,
+        -89.0,
+        36.0,
+      ]),
+      shapePositions: computeCircle(60000.0), // 定义要沿折线拉伸形状的笛卡尔坐标数组
+      ellipsoid: Cesium.Ellipsoid.WGS84,
+      granularity: Cesium.Math.RADIANS_PER_DEGREE, // 每一纬度和经度之间的距离，以弧度表示。确定缓冲区中的位置数
+      // granularity: Cesium.Math.toRadians(180), // 每一纬度和经度之间的距离，以弧度表示。确定缓冲区中的位置数
+      // ROUNDED	拐角有光滑的边缘;MITERED 拐角点是相邻边的交点;BEVELED	拐角被修剪。
+      cornerType: Cesium.CornerType.ROUNDED,
+    });
+
+    var polylineVolumeOutlineInstance = new Cesium.GeometryInstance({
+      geometry: polylineVolumeOutline,
+      // modelMatrix: Cesium.Matrix4.multiplyByTranslation(
+      //   Cesium.Transforms.eastNorthUpToFixedFrame(
+      //     Cesium.Cartesian3.fromDegrees(-65, 40)
+      //   ),
+      //   new Cesium.Cartesian3(0.0, 0.0, 10.0),
+      //   new Cesium.Matrix4()
+      // ),
+      id: "polylineVolumeOutline",
+      attributes: {
+        color: Cesium.ColorGeometryInstanceAttribute.fromColor(
+          Cesium.Color.RED
+        ),
+        show: new Cesium.ShowGeometryInstanceAttribute(true), //显示或者隐藏
+      },
+    });
+
+    viewer.scene.primitives.add(
+      new Cesium.Primitive({
+        geometryInstances: polylineVolumeOutlineInstance,
+        appearance: new Cesium.PerInstanceColorAppearance({
+          translucent: false,
+          closed: false,
+        }),
+      })
+    );
+  </script>
+</body>

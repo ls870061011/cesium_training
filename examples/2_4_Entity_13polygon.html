@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<head>
+  <title>Hello World</title>
+  <script src="../Build/Cesium/Cesium.js"></script>
+  <link href="../Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    var viewer = new Cesium.Viewer("cesiumContainer", {
+      animation: false, // 动画小组件
+      baseLayerPicker: false, // 底图组件，选择三维数字地球的底图（imagery and terrain）。
+      fullscreenButton: false, // 全屏组件
+      vrButton: false, // VR模式
+      geocoder: false, // 地理编码（搜索）组件
+      homeButton: false, // 首页，点击之后将视图跳转到默认视角
+      infoBox: false, // 信息框
+      sceneModePicker: false, // 场景模式，切换2D、3D 和 Columbus View (CV) 模式。
+      selectionIndicator: false, //是否显示选取指示器组件
+      timeline: false, // 时间轴
+      navigationHelpButton: false, // 帮助提示，如何操作数字地球。
+      navigationInstructionsInitiallyVisible: false, // 如果最初应该看到导航说明，则为true；如果直到用户明确单击该按钮，则该提示不显示，否则为false。
+      shouldAnimate: true,
+    });
+
+    // 隐藏logo
+    viewer._cesiumWidget._creditContainer.style.display = "none";
+
+    var redPolygon = viewer.entities.add({
+      name: "Red polygon on surface",
+      polygon: {
+        show: true,
+        // 指定PolygonHierarchy
+        hierarchy: Cesium.Cartesian3.fromDegreesArray([
+          -115.0,
+          37.0,
+          -115.0,
+          32.0,
+          -107.0,
+          33.0,
+          -102.0,
+          31.0,
+          -102.0,
+          35.0,
+        ]),
+        height: 0, // 多边形相对于椭球面的高度
+        heightReference: Cesium.HeightReference.NONE,
+        // extrudedHeight: 0, // 多边形的凸出面相对于椭球面的高度
+        // extrudedHeightReference: Cesium.HeightReference.NONE,
+        stRotation: 0.0, // 多边形纹理从北方逆时针旋转
+        granularity: Cesium.Math.RADIANS_PER_DEGREE, // 每个纬度和经度点之间的角距离
+        fill: true,
+        material: Cesium.Color.RED,
+        outline: false,
+        outlineColor: Cesium.Color.BLACK,
+        outlineWidth: 1.0,
+        perPositionHeight: false, // 是否使用每个位置的高度
+
+        closeTop: true, // 如果为false，则将挤出的多边形顶部留空
+        closeBottom: true, // 如果为false，则将挤出的多边形的底部保留为开放状态
+
+        // 多边形边缘必须遵循的线型    type:ArcType 定义连接顶点应采用的路径。
+        // NONE 与椭圆表面不符的直线;GEODESIC 遵循测地路径;RHUMB	遵循大黄蜂或恶魔般的道路。
+        arcType: Cesium.ArcType.GEODESIC,
+        shadows: Cesium.ShadowMode.DISABLED,
+        // distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
+        //   1.0e3,
+        //   2.0e3
+        // ),
+        // 在地面上时将对地形，3D tiles还是对两者进行分类  type:ClassificationType  default:ClassificationType.BOTH
+        // TERRAIN 将仅对地形进行分类;CESIUM_3D_TILE 将仅对3D Tiles进行分类;BOTH	将同时对Terrain和3D Tiles进行分类。
+        classificationType: Cesium.ClassificationType.BOTH,
+        // 指定用于订购地面几何形状的z索引。仅在多边形为常数且未指定高度或拉伸高度的情况下才有效  type:ConstantProperty
+        zIndex: 0,
+      },
+    });
+
+    var greenPolygon = viewer.entities.add({
+      name: "Green extruded polygon",
+      polygon: {
+        hierarchy: Cesium.Cartesian3.fromDegreesArray([
+          -108.0,
+          42.0,
+          -100.0,
+          42.0,
+          -104.0,
+          40.0,
+        ]),
+        extrudedHeight: 500000.0,
+        material: Cesium.Color.GREEN,
+        closeTop: false,
+        closeBottom: false,
+      },
+    });
+
+    var orangePolygon = viewer.entities.add({
+      name: "Orange polygon with per-position heights and outline",
+      polygon: {
+        hierarchy: Cesium.Cartesian3.fromDegreesArrayHeights([
+          -108.0,
+          25.0,
+          100000,
+          -100.0,
+          25.0,
+          100000,
+          -100.0,
+          30.0,
+          100000,
+          -108.0,
+          30.0,
+          300000,
+        ]),
+        extrudedHeight: 0,
+        perPositionHeight: true,
+        material: Cesium.Color.ORANGE.withAlpha(0.5),
+        outline: true,
+        outlineColor: Cesium.Color.BLACK,
+      },
+    });
+
+    var bluePolygon = viewer.entities.add({
+      name: "Blue polygon with holes",
+      polygon: {
+        hierarchy: {
+          positions: Cesium.Cartesian3.fromDegreesArray([
+            -99.0,
+            30.0,
+            -85.0,
+            30.0,
+            -85.0,
+            40.0,
+            -99.0,
+            40.0,
+          ]),
+          holes: [
+            {
+              positions: Cesium.Cartesian3.fromDegreesArray([
+                -97.0,
+                31.0,
+                -97.0,
+                39.0,
+                -87.0,
+                39.0,
+                -87.0,
+                31.0,
+              ]),
+              holes: [
+                {
+                  positions: Cesium.Cartesian3.fromDegreesArray([
+                    -95.0,
+                    33.0,
+                    -89.0,
+                    33.0,
+                    -89.0,
+                    37.0,
+                    -95.0,
+                    37.0,
+                  ]),
+                  holes: [
+                    {
+                      positions: Cesium.Cartesian3.fromDegreesArray([
+                        -93.0,
+                        34.0,
+                        -91.0,
+                        34.0,
+                        -91.0,
+                        36.0,
+                        -93.0,
+                        36.0,
+                      ]),
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        material: Cesium.Color.BLUE.withAlpha(0.5),
+        height: 0,
+        outline: true, // height is required for outline to display
+      },
+    });
+
+    var cyanPolygon = viewer.entities.add({
+      name: "Cyan vertical polygon with per-position heights and outline",
+      polygon: {
+        hierarchy: Cesium.Cartesian3.fromDegreesArrayHeights([
+          -90.0,
+          41.0,
+          0.0,
+          -85.0,
+          41.0,
+          500000.0,
+          -80.0,
+          41.0,
+          0.0,
+        ]),
+        perPositionHeight: true,
+        material: Cesium.Color.BLACK.withAlpha(0.5),
+        outline: true,
+        outlineColor: Cesium.Color.WHITE,
+      },
+    });
+
+    var purplePolygonUsingRhumbLines = viewer.entities.add({
+      name: "Purple polygon using rhumb lines with outline",
+      polygon: {
+        hierarchy: Cesium.Cartesian3.fromDegreesArray([
+          -120.0,
+          45.0,
+          -80.0,
+          45.0,
+          -80.0,
+          55.0,
+          -120.0,
+          55.0,
+        ]),
+        extrudedHeight: 50000,
+        material: Cesium.Color.PURPLE,
+        outline: true,
+        outlineColor: Cesium.Color.MAGENTA,
+        arcType: Cesium.ArcType.RHUMB,
+      },
+    });
+
+    // 改变材质
+    // 方式一：通过类型创建材质
+    // cyanPolygon.material = Cesium.Material.fromType("Color");
+    // cyanPolygon.material.uniforms.color = Cesium.Color.BLUE;
+
+    // 方式二：创建一个默认材质
+    // cyanPolygon.material = new Cesium.Material();
+
+    // 方式三：通过Fabric方式
+    // cyanPolygon.material = new Cesium.Material({
+    //   fabric: {
+    //     type: "Color",
+    //     uniforms: {
+    //       color: Cesium.Color.BLACK,
+    //     },
+    //   },
+    // });
+    viewer.zoomTo(viewer.entities);
+  </script>
+</body>

@@ -1,0 +1,114 @@
+<!--支持从VT MAK VR-TheWorld Server服务器请求的高度地图地形图。-->
+<!DOCTYPE html>
+<head>
+  <title>Hello World</title>
+  <script src="../Build/Cesium/Cesium.js"></script>
+  <link href="../Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    var viewer = new Cesium.Viewer("cesiumContainer");
+
+    var firstPos = new Cesium.Cartesian3(
+      Cesium.Math.toRadians(75),
+      Cesium.Math.toRadians(40),
+      10
+    );
+    var secondPos = new Cesium.Cartesian3(
+      Cesium.Math.toRadians(74),
+      Cesium.Math.toRadians(40.5),
+      5
+    );
+    // 根据两点计算相机射向
+    let spotLightCamera = new Cesium.Camera(viewer.scene);
+    let direction = Cesium.Cartesian3.normalize(
+      Cesium.Cartesian3.subtract(secondPos, firstPos, new Cesium.Cartesian3()),
+      new Cesium.Cartesian3()
+    );
+    spotLightCamera.position = firstPos; //firstPos是相机起点
+    spotLightCamera.direction = direction; //direction是相机面向的方向
+
+    // 视锥绘制
+    let scratchRight = new Cesium.Cartesian3();
+    let scratchRotation = new Cesium.Matrix3();
+    var scratchOrientation = new Cesium.Quaternion();
+    let position = spotLightCamera.positionWC;
+    let directionWC = spotLightCamera.directionWC;
+    let up = spotLightCamera.upWC;
+    let right = spotLightCamera.rightWC;
+    right = Cesium.Cartesian3.negate(right, scratchRight);
+
+    let rotation = scratchRotation;
+    Cesium.Matrix3.setColumn(rotation, 0, right, rotation);
+    Cesium.Matrix3.setColumn(rotation, 1, up, rotation);
+    Cesium.Matrix3.setColumn(rotation, 2, directionWC, rotation);
+    //计算视锥姿态
+    let orientation = Cesium.Quaternion.fromRotationMatrix(
+      rotation,
+      scratchOrientation
+    );
+
+    //视锥体轮廓线
+    let frustumOutlineInstance = new Cesium.GeometryInstance({
+      geometry: new Cesium.FrustumOutlineGeometry({
+        frustum: spotLightCamera.frustum,
+        origin: firstPos,
+        orientation: orientation,
+      }),
+      // id: "pri" + viewer.scene.primitives.length + 1,
+      attributes: {
+        color: Cesium.ColorGeometryInstanceAttribute.fromColor(
+          new Cesium.Color(0.0, 1.0, 0.0, 1.0)
+        ),
+        show: new Cesium.ShowGeometryInstanceAttribute(true),
+      },
+    });
+    viewer.scene.primitives.add(
+      new Cesium.Primitive({
+        geometryInstances: frustumOutlineInstance,
+        appearance: new Cesium.PerInstanceColorAppearance({
+          translucent: false,
+          closed: true,
+        }),
+      })
+    );
+
+    //视锥体
+    let frustumInstance = new Cesium.GeometryInstance({
+      geometry: new Cesium.FrustumGeometry({
+        frustum: spotLightCamera.frustum, // 视锥体
+        origin: firstPos, // 视锥体的起点
+        orientation: orientation, // 视锥体的方向
+        vertexFormat: Cesium.PerInstanceColorAppearance.VERTEX_FORMAT, // 要计算的顶点属性
+      }),
+      // id: "pri" + viewer.scene.primitives.length + 1,
+      attributes: {
+        color: Cesium.ColorGeometryInstanceAttribute.fromColor(
+          new Cesium.Color(0.0, 1.0, 0.0, 1.0)
+        ),
+        show: new Cesium.ShowGeometryInstanceAttribute(true),
+      },
+    });
+    viewer.scene.primitives.add(
+      new Cesium.Primitive({
+        geometryInstances: frustumInstance,
+        appearance: new Cesium.PerInstanceColorAppearance({
+          translucent: false,
+          closed: true,
+        }),
+      })
+    );
+  </script>
+</body>

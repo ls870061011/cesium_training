@@ -1,0 +1,101 @@
+<!--支持从VT MAK VR-TheWorld Server服务器请求的高度地图地形图。-->
+<!DOCTYPE html>
+<head>
+  <title>Hello World</title>
+  <script src="../Build/Cesium/Cesium.js"></script>
+  <link href="../Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    var viewer = new Cesium.Viewer("cesiumContainer");
+
+    // A polyline with two connected line segments
+    var polyline = new Cesium.PolylineGeometry({
+      positions: Cesium.Cartesian3.fromDegreesArray([-75, 37, -105, 37]),
+      width: 10.0,
+      // colors: [], // 定义每个顶点或每段颜色的颜色数组。
+      colorsPerVertex: false, // 颜色是在直线的每一段上是平的，还是在顶点上进行插值
+      arcType: Cesium.ArcType.GEODESIC,
+      granularity: Cesium.Math.RADIANS_PER_DEGREE,
+      vertexFormat: Cesium.PerInstanceColorAppearance.VERTEX_FORMAT,
+      ellipsoid: Cesium.Ellipsoid.WGS84,
+    });
+
+    var polylineInstance = new Cesium.GeometryInstance({
+      geometry: polyline,
+      // modelMatrix: Cesium.Matrix4.multiplyByTranslation(
+      //   Cesium.Transforms.eastNorthUpToFixedFrame(
+      //     Cesium.Cartesian3.fromDegrees(-75, 40, 100)
+      //   ),
+      //   new Cesium.Cartesian3(0.0, 0.0, 0.0),
+      //   new Cesium.Matrix4()
+      // ),
+      id: "polyline",
+      attributes: {
+        color: Cesium.ColorGeometryInstanceAttribute.fromColor(
+          Cesium.Color.BLUE
+        ),
+        show: new Cesium.ShowGeometryInstanceAttribute(true), //显示或者隐藏
+      },
+    });
+
+    viewer.scene.primitives.add(
+      new Cesium.Primitive({
+        geometryInstances: polylineInstance,
+        appearance: new Cesium.PerInstanceColorAppearance({
+          translucent: false,
+          closed: false,
+        }),
+      })
+    );
+
+    var simplePolyline = new Cesium.SimplePolylineGeometry({
+      positions: Cesium.Cartesian3.fromDegreesArray([-75, 35, -105, 35]),
+      // colors: [], // 定义每个顶点或每段颜色的颜色数组。
+      colorsPerVertex: false, // 颜色是在直线的每一段上是平的，还是在顶点上进行插值
+      arcType: Cesium.ArcType.GEODESIC,
+      granularity: Cesium.Math.RADIANS_PER_DEGREE,
+      ellipsoid: Cesium.Ellipsoid.WGS84,
+    });
+
+    var simplePolylineInstance = new Cesium.GeometryInstance({
+      geometry: simplePolyline,
+      // modelMatrix: Cesium.Matrix4.multiplyByTranslation(
+      //   Cesium.Transforms.eastNorthUpToFixedFrame(
+      //     Cesium.Cartesian3.fromDegrees(-75, 40, 100)
+      //   ),
+      //   new Cesium.Cartesian3(0.0, 0.0, 0.0),
+      //   new Cesium.Matrix4()
+      // ),
+      id: "simplePolyline",
+      attributes: {
+        color: Cesium.ColorGeometryInstanceAttribute.fromColor(
+          Cesium.Color.RED
+        ),
+        show: new Cesium.ShowGeometryInstanceAttribute(true), //显示或者隐藏
+      },
+    });
+
+    viewer.scene.primitives.add(
+      new Cesium.Primitive({
+        geometryInstances: simplePolylineInstance,
+        appearance: new Cesium.PerInstanceColorAppearance({
+          translucent: false,
+          closed: false,
+        }),
+      })
+    );
+  </script>
+</body>

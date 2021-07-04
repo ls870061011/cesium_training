@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<head>
+  <title>Hello World</title>
+  <script src="../Build/Cesium/Cesium.js"></script>
+  <link href="../Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <div id="mouse_state"></div>
+  <script>
+    var viewer = new Cesium.Viewer("cesiumContainer", {
+      animation: false, // 动画小组件
+      baseLayerPicker: true, // 底图组件，选择三维数字地球的底图（imagery and terrain）。
+      fullscreenButton: false, // 全屏组件
+      vrButton: false, // VR模式
+      geocoder: false, // 地理编码（搜索）组件
+      homeButton: true, // 首页，点击之后将视图跳转到默认视角
+      infoBox: false, // 信息框
+      sceneModePicker: false, // 场景模式，切换2D、3D 和 Columbus View (CV) 模式。
+      selectionIndicator: false, //是否显示选取指示器组件
+      timeline: false, // 时间轴
+      navigationHelpButton: false, // 帮助提示，如何操作数字地球。
+      navigationInstructionsInitiallyVisible: false, // 如果最初应该看到导航说明，则为true；如果直到用户明确单击该按钮，则该提示不显示，否则为false。
+    });
+
+    // 隐藏logo
+    viewer._cesiumWidget._creditContainer.style.display = "none";
+
+    // 添加point Entity
+    viewer.entities.add({
+      id: "point_1",
+      name: "point",
+      position: Cesium.Cartesian3.fromDegrees(-97.5, 21.5),
+      point: {
+        pixelSize: 10, // 像素大小
+      },
+    });
+
+    // 添加polygon Entity
+    viewer.entities.add({
+      id: "rectangle_1",
+      name: "rectangle",
+      description: "这是一个矩形",
+      rectangle: {
+        coordinates: Cesium.Rectangle.fromDegrees(-100.0, 20.0, -97.5, 22.0),
+        material: Cesium.Color.GREEN,
+      },
+    });
+
+    // 添加gltf Entity
+    var url = "./data/models/CesiumAir/Cesium_Air.glb";
+    var position = Cesium.Cartesian3.fromDegrees(-97.5, 21.0, 5);
+    var gltf = viewer.entities.add({
+      name: "model",
+      position: position,
+      model: {
+        uri: url,
+        minimumPixelSize: 128, // 模型的最小最小像素大小，而不考虑缩放
+        maximumScale: 20000, // 模型的最大比例尺大小。 minimumPixelSize的上限
+        runAnimations: true,
+        clampAnimations: true,
+      },
+    });
+    viewer.trackedEntity = gltf;
+    // viewer.zoomTo(viewer.entities);
+
+    viewer.selectedEntityChanged.addEventListener(function (entity) {
+      console.log(entity.id);
+    });
+
+    // viewer.trackedEntity重新改变时调用该事件
+    viewer.trackedEntityChanged.addEventListener(function (entity) {
+      console.log(entity.id);
+    });
+  </script>
+</body>

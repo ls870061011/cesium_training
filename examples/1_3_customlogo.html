@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<head>
+  <title>Hello World</title>
+  <script src="../Build/Cesium/Cesium.js"></script>
+  <link href="../Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    /* 隐藏底部logo */
+    /* .cesium-widget-credits {
+      display: none !important;
+    } */
+
+    .cesium-credit-logoContainer {
+    }
+
+    .cesium-credit-textContainer,
+    .cesium-credit-expand-link {
+      display: none !important;
+    }
+
+    /* 通过CSS控制组件显隐及位置 */
+    .cesium-viewer-toolbar,             /* 右上角按钮组 */
+    .cesium-viewer-animationContainer,  /* 左下角动画控件 */
+    .cesium-viewer-timelineContainer,   /* 时间线 */
+    .cesium-viewer-bottom               /* logo信息 */ {
+      /* display: none !important;
+      visibility: hide !important; */
+    }
+    .cesium-viewer-fullscreenContainer  /* 全屏按钮 */ {
+      /* position: absolute;
+      top: 0; */
+    }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    var viewer = new Cesium.Viewer("cesiumContainer", {
+      animation: false, // 动画小组件
+      baseLayerPicker: false, // 底图组件，选择三维数字地球的底图（imagery and terrain）。
+      fullscreenButton: false, // 全屏组件
+      vrButton: false, // VR模式
+      geocoder: false, // 地理编码（搜索）组件
+      homeButton: false, // 首页，点击之后将视图跳转到默认视角
+      infoBox: false, // 信息框
+      sceneModePicker: false, // 场景模式，切换2D、3D 和 Columbus View (CV) 模式。
+      selectionIndicator: false, //是否显示选取指示器组件
+      timeline: false, // 时间轴
+      navigationHelpButton: false, // 帮助提示，如何操作数字地球。
+      navigationInstructionsInitiallyVisible: false,
+    });
+
+    // 隐藏logo
+    viewer._cesiumWidget._creditContainer.style.display = "none";
+
+    // 使用ViewportQuad创建一个显示图片的区域
+    var viewportQuad = new Cesium.ViewportQuad();
+    viewportQuad.rectangle = new Cesium.BoundingRectangle(5, 5, 80, 92);
+    viewer.scene.primitives.add(viewportQuad);
+
+    viewportQuad.material = new Cesium.Material({
+      fabric: {
+        type: "Image",
+        uniforms: {
+          color: new Cesium.Color(1.0, 1.0, 1.0, 1.0),
+          image: Cesium.buildModuleUrl("Assets/Images/bing_maps_credit.png"),
+        },
+      },
+    });
+  </script>
+</body>

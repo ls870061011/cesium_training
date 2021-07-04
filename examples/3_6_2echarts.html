@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<head>
+  <title>Hello World</title>
+  <script src="../Build/Cesium/Cesium.js"></script>
+  <link href="../Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+
+  <script src="https://cdn.bootcss.com/echarts/4.7.0/echarts.js"></script>
+  <script src="./libs/cesium_data.js"></script>
+  <script src="./libs/cesium_echartslayer.js"></script>
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    var viewer = new Cesium.Viewer("cesiumContainer", {
+      geocoder: false,
+      homeButton: false,
+      baseLayerPicker: false,
+      navigationHelpButton: false,
+      animation: false,
+      sceneModePicker: false,
+      selectionIndicator: false,
+      infoBox: false,
+      scene3DOnly: false,
+      timeline: false,
+      CreditsDisplay: false,
+      imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+        url:
+          "http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer",
+        enablePickFeatures: false,
+      }),
+    });
+    viewer.scene.globe.baseColor = new Cesium.Color(1, 1, 1, 0);
+    viewer.scene.globe.depthTestAgainstTerrain = true;
+    viewer._cesiumWidget._creditContainer.style.display = "none";
+
+    //let uoption = getOption(_basedata);
+    let _echartLayer = new EchartsLayer(viewer, option);
+  </script>
+</body>

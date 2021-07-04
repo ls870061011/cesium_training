@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<head>
+  <title>Hello World</title>
+  <script src="../Build/Cesium/Cesium.js"></script>
+  <link href="../Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    var viewer = new Cesium.Viewer("cesiumContainer", {
+      animation: false, // 动画小组件
+      baseLayerPicker: true, // 底图组件，选择三维数字地球的底图（imagery and terrain）。
+      fullscreenButton: false, // 全屏组件
+      vrButton: false, // VR模式
+      geocoder: false, // 地理编码（搜索）组件
+      homeButton: true, // 首页，点击之后将视图跳转到默认视角
+      infoBox: false, // 信息框
+      sceneModePicker: false, // 场景模式，切换2D、3D 和 Columbus View (CV) 模式。
+      selectionIndicator: false, //是否显示选取指示器组件
+      timeline: false, // 时间轴
+      navigationHelpButton: false, // 帮助提示，如何操作数字地球。
+      navigationInstructionsInitiallyVisible: false, // 如果最初应该看到导航说明，则为true；如果直到用户明确单击该按钮，则该提示不显示，否则为false。
+    });
+
+    // 隐藏logo
+    viewer._cesiumWidget._creditContainer.style.display = "none";
+
+    // 需要回调的函数
+    function callbackFunc(event) {
+      cosnole.log(event);
+    }
+
+    // 1.更新或呈现场景之前将引发的事件
+    viewer.scene.preUpdate.addEventListender(callbackFunc);
+    viewer.scene.preUpdate.removeEventListender(callbackFunc);
+
+    // 2.场景更新后以及渲染场景之前立即引发的事件
+    viewer.scene.postUpdate.addEventListender(callbackFunc);
+    viewer.scene.postUpdate.removeEventListender(callbackFunc);
+
+    // 3.场景更新后以及渲染场景之前将引发的事件
+    viewer.scene.preRender.addEventListender(callbackFunc);
+    viewer.scene.preRender.removeEventListender(callbackFunc);
+
+    // 4.渲染场景后立即引发的事件
+    viewer.scene.postRender.addEventListender(callbackFunc);
+    viewer.scene.postRender.removeEventListender(callbackFunc);
+  </script>
+</body>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<head>
+  <title>Hello World</title>
+  <script src="../Build/Cesium/Cesium.js"></script>
+  <link href="../Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    var viewer = new Cesium.Viewer("cesiumContainer", {
+      animation: false, // 动画小组件
+      baseLayerPicker: false, // 底图组件，选择三维数字地球的底图（imagery and terrain）。
+      fullscreenButton: false, // 全屏组件
+      vrButton: false, // VR模式
+      geocoder: false, // 地理编码（搜索）组件
+      homeButton: false, // 首页，点击之后将视图跳转到默认视角
+      infoBox: false, // 信息框
+      sceneModePicker: false, // 场景模式，切换2D、3D 和 Columbus View (CV) 模式。
+      selectionIndicator: false, //是否显示选取指示器组件
+      timeline: false, // 时间轴
+      navigationHelpButton: false, // 帮助提示，如何操作数字地球。
+      navigationInstructionsInitiallyVisible: false, // 如果最初应该看到导航说明，则为true；如果直到用户明确单击该按钮，则该提示不显示，否则为false。
+      shouldAnimate: true,
+    });
+
+    // 隐藏logo
+    viewer._cesiumWidget._creditContainer.style.display = "none";
+
+    var redLine = viewer.entities.add({
+      name: "Red line on terrain",
+      polyline: {
+        show: true,
+
+        // 定义线条的 Cartesian3 位置的数组
+        positions: Cesium.Cartesian3.fromDegreesArray([-75, 35, -125, 35]),
+
+        width: 5,
+        // 如果arcType不是ArcType.NONE，则指定每个纬度和经度之间的角距离
+        // granularity: Cesium.Math.RADIANS_PER_DEGREE,
+
+        material: Cesium.Color.RED,
+        // 线低于地形时用于绘制折线的材质
+        // depthFailMaterial: Cesium.Color.WHITE,
+
+        // 折线段必须遵循的线型
+        // arcType: Cesium.ArcType.GEODESIC,
+
+        clampToGround: true, // 是否贴地
+
+        shadows: Cesium.ShadowMode.DISABLED, // 折线是投射还是接收光源的阴影
+
+        // distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
+        //   1.0e3,
+        //   2.0e3
+        // ),
+
+        // 在地面上时将对地形，3D tiles还是对两者进行分类  type:ClassificationType  default:ClassificationType.BOTH
+        // TERRAIN 将仅对地形进行分类;CESIUM_3D_TILE 将仅对3D Tiles进行分类;BOTH	将同时对Terrain和3D Tiles进行分类。
+        classificationType: Cesium.ClassificationType.BOTH,
+
+        // 指定用于订购地面几何形状的z索引。仅在多边形为常数且未指定高度或拉伸高度的情况下才有效  type:ConstantProperty
+        // zIndex: 0,
+      },
+    });
+
+    var greenRhumbLine = viewer.entities.add({
+      name: "Green rhumb line",
+      polyline: {
+        positions: Cesium.Cartesian3.fromDegreesArray([-75, 35, -125, 35]),
+        width: 5,
+        arcType: Cesium.ArcType.RHUMB,
+        material: Cesium.Color.GREEN,
+      },
+    });
+
+    var glowingLine = viewer.entities.add({
+      name: "Glowing blue line on the surface",
+      polyline: {
+        positions: Cesium.Cartesian3.fromDegreesArray([-75, 37, -125, 37]),
+        width: 10,
+        material: new Cesium.PolylineGlowMaterialProperty({
+          glowPower: 0.2,
+          taperPower: 0.5,
+          color: Cesium.Color.CORNFLOWERBLUE,
+        }),
+      },
+    });
+
+    var orangeOutlined = viewer.entities.add({
+      name:
+        "Orange line with black outline at height and following the surface",
+      polyline: {
+        positions: Cesium.Cartesian3.fromDegreesArrayHeights([
+          -75,
+          39,
+          250000,
+          -125,
+          39,
+          250000,
+        ]),
+        width: 5,
+        material: new Cesium.PolylineOutlineMaterialProperty({
+          color: Cesium.Color.ORANGE,
+          outlineWidth: 2,
+          outlineColor: Cesium.Color.BLACK,
+        }),
+      },
+    });
+
+    var purpleArrow = viewer.entities.add({
+      name: "Purple straight arrow at height",
+      polyline: {
+        positions: Cesium.Cartesian3.fromDegreesArrayHeights([
+          -75,
+          43,
+          500000,
+          -125,
+          43,
+          500000,
+        ]),
+        width: 10,
+        arcType: Cesium.ArcType.NONE,
+        material: new Cesium.PolylineArrowMaterialProperty(Cesium.Color.PURPLE),
+      },
+    });
+
+    var dashedLine = viewer.entities.add({
+      name: "Blue dashed line",
+      polyline: {
+        positions: Cesium.Cartesian3.fromDegreesArrayHeights([
+          -75,
+          45,
+          500000,
+          -125,
+          45,
+          500000,
+        ]),
+        width: 4,
+        material: new Cesium.PolylineDashMaterialProperty({
+          color: Cesium.Color.CYAN,
+        }),
+      },
+    });
+
+    viewer.zoomTo(viewer.entities);
+  </script>
+</body>

@@ -1,0 +1,105 @@
+<!--支持从VT MAK VR-TheWorld Server服务器请求的高度地图地形图。-->
+<!DOCTYPE html>
+<head>
+  <title>Hello World</title>
+  <script src="../Build/Cesium/Cesium.js"></script>
+  <link href="../Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    var viewer = new Cesium.Viewer("cesiumContainer");
+
+    var ellipse = new Cesium.EllipseGeometry({
+      center: Cesium.Cartesian3.fromDegrees(-75, 40), // 椭圆中心点
+      semiMajorAxis: 500000.0, // 半长轴的长度
+      semiMinorAxis: 300000.0, // 半短轴的长度
+      ellipsoid: Cesium.Ellipsoid.WGS84,
+      height: 10.0,
+      extrudedHeight: 100000.0,
+      rotation: 0.0, // 从正北逆时针旋转的角度
+      rotation: Cesium.Math.toRadians(45.0), // 纹理旋转，从正北逆时针旋转
+      granularity: Cesium.Math.RADIANS_PER_DEGREE, // 椭圆上的点之间的弧度角（弧度）
+      vertexFormat: Cesium.PerInstanceColorAppearance.VERTEX_FORMAT, // 要计算的顶点属性
+    });
+
+    var ellipseInstance = new Cesium.GeometryInstance({
+      geometry: ellipse,
+      // modelMatrix: Cesium.Matrix4.multiplyByTranslation(
+      //   Cesium.Transforms.eastNorthUpToFixedFrame(
+      //     Cesium.Cartesian3.fromDegrees(-65, 40)
+      //   ),
+      //   new Cesium.Cartesian3(0.0, 0.0, 10.0),
+      //   new Cesium.Matrix4()
+      // ),
+      id: "ellipse",
+      attributes: {
+        color: Cesium.ColorGeometryInstanceAttribute.fromColor(
+          Cesium.Color.BLUE
+        ),
+        show: new Cesium.ShowGeometryInstanceAttribute(true), //显示或者隐藏
+      },
+    });
+
+    viewer.scene.primitives.add(
+      new Cesium.Primitive({
+        geometryInstances: ellipseInstance,
+        appearance: new Cesium.PerInstanceColorAppearance({
+          translucent: false,
+          closed: false,
+        }),
+      })
+    );
+
+    var ellipseOutline = new Cesium.EllipseOutlineGeometry({
+      center: Cesium.Cartesian3.fromDegrees(-70, 40), // 椭圆中心点
+      semiMajorAxis: 500000.0, // 半长轴的长度
+      semiMinorAxis: 300000.0, // 半短轴的长度
+      ellipsoid: Cesium.Ellipsoid.WGS84,
+      height: 10.0,
+      extrudedHeight: 1000000.0,
+      rotation: Cesium.Math.toRadians(45.0), // 从正北逆时针旋转的角度
+      granularity: 0.02, // 椭圆上的点之间的弧度角（弧度）
+      numberOfVerticalLines: 64, // 在拉伸的椭圆的顶面和底面之间绘制的线数
+    });
+
+    var ellipseOutlineInstance = new Cesium.GeometryInstance({
+      geometry: ellipseOutline,
+      // modelMatrix: Cesium.Matrix4.multiplyByTranslation(
+      //   Cesium.Transforms.eastNorthUpToFixedFrame(
+      //     Cesium.Cartesian3.fromDegrees(-65, 40)
+      //   ),
+      //   new Cesium.Cartesian3(0.0, 0.0, 10.0),
+      //   new Cesium.Matrix4()
+      // ),
+      id: "ellipseOutline",
+      attributes: {
+        color: Cesium.ColorGeometryInstanceAttribute.fromColor(
+          Cesium.Color.RED
+        ),
+        show: new Cesium.ShowGeometryInstanceAttribute(true), //显示或者隐藏
+      },
+    });
+
+    viewer.scene.primitives.add(
+      new Cesium.Primitive({
+        geometryInstances: ellipseOutlineInstance,
+        appearance: new Cesium.PerInstanceColorAppearance({
+          translucent: false,
+          closed: false,
+        }),
+      })
+    );
+  </script>
+</body>

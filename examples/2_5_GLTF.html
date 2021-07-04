@@ -1,0 +1,100 @@
+<!--支持从VT MAK VR-TheWorld Server服务器请求的高度地图地形图。-->
+<!DOCTYPE html>
+<head>
+  <title>Hello World</title>
+  <script src="../Build/Cesium/Cesium.js"></script>
+  <link href="../Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    var viewer = new Cesium.Viewer("cesiumContainer", {
+      shouldAnimate: true,
+    });
+    viewer.extend(Cesium.viewerCesiumInspectorMixin);
+
+    /** Entity方式添加gltf **********************************************************************************/
+    var position = Cesium.Cartesian3.fromDegrees(-120.05, 44, 0);
+    var heading = Cesium.Math.toRadians(45);
+    var pitch = 0;
+    var roll = 0;
+    var hpr = new Cesium.HeadingPitchRoll(heading, pitch, roll);
+    var orientation = Cesium.Transforms.headingPitchRollQuaternion(
+      position,
+      hpr
+    );
+    var model_entity = viewer.entities.add({
+      name: "gltf模型",
+      position: position,
+      // 默认情况下，模型是直立的并面向东。
+      // 通过 Quaternion 为 Entity.orientation 属性指定值来控制模型的方向，控制模型的航向，俯仰和横滚。
+      orientation: orientation,
+      model: {
+        show: true,
+        uri: "./data/models/DracoCompressed/CesiumMilkTruck.gltf",
+        scale: 1.0, // 缩放比例
+        minimumPixelSize: 128, // 最小像素大小
+        maximumScale: 20000, // 模型的最大比例尺大小。 minimumPixelSize的上限
+        incrementallyLoadTextures: true, // 加载模型后纹理是否可以继续流入
+        runAnimations: true, // 是否应启动模型中指定的glTF动画
+        clampAnimations: true, // 指定glTF动画是否应在没有关键帧的持续时间内保持最后一个姿势
+
+        // 指定模型是否投射或接收来自光源的阴影 type:ShadowMode
+        // DISABLED	对象不投射或接收阴影;ENABLED 对象投射并接收阴影;CAST_ONLY	对象仅投射阴影;RECEIVE_ONLY	对象仅接收阴影
+        shadows: Cesium.ShadowMode.ENABLED,
+        heightReference: Cesium.HeightReference.NONE,
+      },
+    });
+    // viewer.trackedEntity = entity; // 相机保持在实体上
+
+    /** Primitive方式添加gltf **********************************************************************************/
+    var origin = Cesium.Cartesian3.fromDegrees(-120, 44.0, 0);
+    // 创建一个本地的东北向上坐标系，其原点为经度-120度，纬度44.0度。
+    // 可以随时更改模型的modelMatrix属性以移动或旋转模型。
+    var modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(origin);
+    var model = viewer.scene.primitives.add(
+      Cesium.Model.fromGltf({
+        url: "./data/models/DracoCompressed/CesiumMilkTruck.gltf",
+        modelMatrix: modelMatrix,
+        minimumPixelSize: 128,
+        maximumScale: 20000,
+      })
+    );
+    model.readyPromise.then(function (model) {
+      // Play all animations when the model is ready to render
+      model.activeAnimations.addAll();
+      // model.activeAnimations.addAll({
+      //   // type:ModelAnimationLoop
+      //   // NONE 只播放一次；REPEAT 从头开始循环播放；MIRRORED_REPEAT 首先，将其向前播放，然后反向播放，然后向前播放
+      //   loop: Cesium.ModelAnimationLoop.REPEAT, // 循环播放动画
+      // });
+    });
+
+    viewer.zoomTo(viewer.entities);
+
+    /** 获取模型pick内容 **********************************************************************************/
+    var handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+    handler.setInputAction(function (movement) {
+      var pick = viewer.scene.pick(movement.position);
+      if (
+        Cesium.defined(pick) &&
+        Cesium.defined(pick.node) &&
+        Cesium.defined(pick.mesh)
+      ) {
+        console.log(pick.node);
+        console.log(pick.mesh);
+      }
+    }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+  </script>
+</body>

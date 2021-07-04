@@ -1,0 +1,85 @@
+<!--支持从VT MAK VR-TheWorld Server服务器请求的高度地图地形图。-->
+<!DOCTYPE html>
+<head>
+  <title>Hello World</title>
+  <script src="../Build/Cesium/Cesium.js"></script>
+  <link href="../Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    var viewer = new Cesium.Viewer("cesiumContainer");
+    var scene = viewer.scene;
+
+    // Create a billboard collection with two billboards
+    var billboards = scene.primitives.add(
+      new Cesium.BillboardCollection({
+        modelMatrix: Cesium.Matrix4.IDENTITY,
+        debugShowBoundingVolume: false,
+        scene: scene,
+        // OPAQUE 完全不透明；TRANSLUCENT 完全透明；OPAQUE_AND_TRANSLUCENT 不透明和半透明
+        blendOption: Cesium.BlendOption.OPAQUE_AND_TRANSLUCENT,
+      })
+    );
+    // add Billboard
+    billboards.add({
+      position: Cesium.Cartesian3.fromDegrees(-75.59777, 40.03883, 3000.0),
+      image: "./images/facility.gif",
+    });
+    billboards.add({
+      position: Cesium.Cartesian3.fromDegrees(-74.59777, 40.03883, 3000.0),
+      image: "./images/facility.gif",
+    });
+
+    // Create a label collection with two labels
+    // var center = Cesium.Cartesian3.fromDegrees(-75.59777, 40.03883);
+    var labels = scene.primitives.add(
+      new Cesium.LabelCollection({
+        modelMatrix: Cesium.Matrix4.IDENTITY,
+        debugShowBoundingVolume: false,
+        scene: scene,
+        // OPAQUE 完全不透明；TRANSLUCENT 完全透明；OPAQUE_AND_TRANSLUCENT 不透明和半透明
+        blendOption: Cesium.BlendOption.OPAQUE_AND_TRANSLUCENT,
+      })
+    );
+    // add Label
+    labels.add({
+      position: Cesium.Cartesian3.fromDegrees(-75.59777, 41.03883, 2000.0),
+      text: "A label",
+    });
+    labels.add({
+      position: Cesium.Cartesian3.fromDegrees(-74.59777, 41.03883, 2000.0),
+      text: "Another label",
+    });
+
+    // Create a pointPrimitive collection with two points
+    var points = scene.primitives.add(
+      new Cesium.PointPrimitiveCollection({
+        modelMatrix: Cesium.Matrix4.IDENTITY,
+        debugShowBoundingVolume: false,
+        // OPAQUE 完全不透明；TRANSLUCENT 完全透明；OPAQUE_AND_TRANSLUCENT 不透明和半透明
+        blendOption: Cesium.BlendOption.OPAQUE_AND_TRANSLUCENT,
+      })
+    );
+    // add PointPrimitive
+    points.add({
+      position: Cesium.Cartesian3.fromDegrees(-75.59777, 40.53883, 1000.0),
+      color: Cesium.Color.YELLOW,
+    });
+    points.add({
+      position: Cesium.Cartesian3.fromDegrees(-74.59777, 40.53883, 1000.0),
+      color: Cesium.Color.CYAN,
+    });
+  </script>
+</body>

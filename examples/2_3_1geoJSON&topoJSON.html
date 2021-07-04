@@ -1,0 +1,115 @@
+<!--支持从VT MAK VR-TheWorld Server服务器请求的高度地图地形图。-->
+<!DOCTYPE html>
+<head>
+  <title>Hello World</title>
+  <script src="../Build/Cesium/Cesium.js"></script>
+  <link href="../Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    var viewer = new Cesium.Viewer("cesiumContainer", {
+      animation: false, // 动画小组件
+      baseLayerPicker: false, // 底图组件，选择三维数字地球的底图（imagery and terrain）。
+      fullscreenButton: false, // 全屏组件
+      vrButton: false, // VR模式
+      geocoder: false, // 地理编码（搜索）组件
+      homeButton: false, // 首页，点击之后将视图跳转到默认视角
+      infoBox: true, // 信息框
+      sceneModePicker: false, // 场景模式，切换2D、3D 和 Columbus View (CV) 模式。
+      selectionIndicator: false, //是否显示选取指示器组件
+      timeline: false, // 时间轴
+      navigationHelpButton: false, // 帮助提示，如何操作数字地球。
+      navigationInstructionsInitiallyVisible: false, // 如果最初应该看到导航说明，则为true；如果直到用户明确单击该按钮，则该提示不显示，否则为false。
+    });
+
+    // 隐藏logo
+    viewer._cesiumWidget._creditContainer.style.display = "none";
+
+    //Load a GeoJSON file containing simplestyle information.
+    // var dataSource = Cesium.GeoJsonDataSource.load(
+    //   "./data/simplestyles.geojson"
+    // );
+
+    //Example 1: Load with default styling.
+    // var dataSource = viewer.dataSources.add(
+    //   Cesium.GeoJsonDataSource.load("./data/ne_10m_us_states.topojson")
+    // );
+
+    //Example 2: Load with basic styling options.
+    // var dataSource = Cesium.GeoJsonDataSource.load(
+    //   "./data/ne_10m_us_states.topojson",
+    //   {
+    //     stroke: Cesium.Color.HOTPINK,
+    //     fill: Cesium.Color.PINK.withAlpha(0.5),
+    //     strokeWidth: 3,
+    //   }
+    // );
+
+    // viewer.dataSources.add(dataSource);
+    // viewer.flyTo(dataSource);
+
+    //Example 3: Apply custom graphics after load.
+    var promise = Cesium.GeoJsonDataSource.load(
+      "./data/ne_10m_us_states.topojson"
+    );
+    promise
+      .then(function (dataSource) {
+        viewer.dataSources.add(dataSource);
+        viewer.flyTo(dataSource);
+
+        //Get the array of entities
+        var entities = dataSource.entities.values;
+
+        var colorHash = {};
+        for (var i = 0; i < entities.length; i++) {
+          //For each entity, create a random color based on the state name.
+          //Some states have multiple entities, so we store the color in a
+          //hash so that we use the same color for the entire state.
+          var entity = entities[i];
+          var name = entity.name;
+          var color = colorHash[name];
+          if (!color) {
+            color = Cesium.Color.fromRandom({
+              alpha: 1.0,
+            });
+            colorHash[name] = color;
+          }
+
+          //Set the polygon material to our random color.
+          entity.polygon.material = color;
+          //Remove the outlines.
+          entity.polygon.outline = false;
+
+          //Extrude the polygon based on the state's population.  Each entity
+          //stores the properties for the GeoJSON feature it was created from
+          //Since the population is a huge number, we divide by 50.
+          entity.polygon.extrudedHeight = entity.properties.Population / 50.0;
+        }
+      })
+      .otherwise(function (error) {
+        //Display any errrors encountered while loading.
+        window.alert(error);
+      });
+
+    var handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
+    handler.setInputAction(function (movement) {
+      // var feature = inspectorViewModel.feature;
+      var feature = viewer.scene.pick(movement.position);
+      if (Cesium.defined(feature)) {
+        
+      }
+    }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+  </script>
+</body>
