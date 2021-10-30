@@ -1,0 +1,389 @@
+<!--支持从VT MAK VR-TheWorld Server服务器请求的高度地图地形图。-->
+<!DOCTYPE html>
+<head>
+  <title>Hello World</title>
+  <script src="../Build/Cesium/Cesium.js"></script>
+  <link href="../Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    #toolbar {
+      background: rgba(42, 42, 42, 0.8);
+      padding: 4px;
+      border-radius: 4px;
+      position: absolute;
+      top: 10px;
+    }
+    #toolbar input {
+      vertical-align: middle;
+      padding-top: 2px;
+      padding-bottom: 2px;
+    }
+
+    #toolbar tr > td:first-child {
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <div id="toolbar">
+    <table>
+      <tbody>
+        <tr>
+          <td>比例</td>
+          <td>
+            <input
+              type="range"
+              min="0"
+              max="10"
+              step="0.1"
+              data-bind="value: scale, valueUpdate: 'input'"
+            />
+            <input type="text" size="5" data-bind="value: scale" />
+          </td>
+        </tr>
+        <!-- <tr>
+          <td>经度</td>
+          <td>
+            <input
+              type="range"
+              min="-180"
+              max="180"
+              step="0.00001"
+              data-bind="value: longitude, valueUpdate: 'input'"
+            />
+            <input type="text" size="5" data-bind="value: longitude" />
+          </td>
+        </tr>
+        <tr>
+          <td>纬度</td>
+          <td>
+            <input
+              type="range"
+              min="-90"
+              max="90"
+              step="0.00001"
+              data-bind="value: latitude, valueUpdate: 'input'"
+            />
+            <input type="text" size="5" data-bind="value: latitude" />
+          </td>
+        </tr> -->
+        <tr>
+          <td>高度</td>
+          <td>
+            <input
+              type="range"
+              min="-100"
+              max="100"
+              step="1"
+              data-bind="value: height, valueUpdate: 'input'"
+            />
+            <input type="text" size="5" data-bind="value: height" />
+          </td>
+        </tr>
+        <tr>
+          <td>绕X轴旋转</td>
+          <td>
+            <input
+              type="range"
+              min="-100"
+              max="100"
+              data-bind="value: rx, valueUpdate: 'input'"
+            />
+            <input type="text" size="5" data-bind="value: rx" />
+          </td>
+        </tr>
+        <tr>
+          <td>绕Y轴旋转</td>
+          <td>
+            <input
+              type="range"
+              min="-100"
+              max="100"
+              data-bind="value: ry, valueUpdate: 'input'"
+            />
+            <input type="text" size="5" data-bind="value: ry" />
+          </td>
+        </tr>
+        <tr>
+          <td>绕z轴旋转</td>
+          <td>
+            <input
+              type="range"
+              min="-100"
+              max="100"
+              data-bind="value: rz, valueUpdate: 'input'"
+            />
+            <input type="text" size="5" data-bind="value: rz" />
+          </td>
+        </tr>
+        <!-- <tr>
+          <td>透明度</td>
+          <td>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              data-bind="value: alpha, valueUpdate: 'input'"
+            />
+            <input type="text" size="5" data-bind="value: alpha" />
+          </td>
+        </tr> -->
+      </tbody>
+    </table>
+  </div>
+  <script>
+    var viewer = new Cesium.Viewer("cesiumContainer", {
+      shouldAnimate: true,
+    });
+    viewer.extend(Cesium.viewerCesiumInspectorMixin);
+
+    var viewModel = {
+      scale: 1.0, // 缩放比例
+      longitude: -75.61209430782448, // 经度
+      latitude: 40.042530623591624, // 纬度
+      height: 0, // 高度
+      rx: 0, // 绕x轴旋转
+      ry: 0, // 绕y轴旋转
+      rz: 0, // 绕z轴旋转
+    };
+
+    Cesium.knockout.track(viewModel);
+    var toolbar = document.getElementById("toolbar");
+    Cesium.knockout.applyBindings(viewModel, toolbar);
+
+    // /** Primitive方式添加gltf **********************************************************************************/
+    var origin = Cesium.Cartesian3.fromDegrees(-120, 44.0, 0);
+    var hpr = new Cesium.HeadingPitchRoll(
+      Cesium.Math.toRadians(0),
+      Cesium.Math.toRadians(0),
+      Cesium.Math.toRadians(0)
+    );
+    // 创建一个本地的东北向上坐标系，其原点为经度-120度，纬度44.0度。
+    // 可以随时更改模型的modelMatrix属性以移动或旋转模型。
+    var modelMatrix = Cesium.Transforms.headingPitchRollToFixedFrame(
+      origin,
+      hpr,
+      Cesium.Ellipsoid.WGS84,
+      Cesium.Transforms.eastNorthUpToFixedFrame,
+      new Cesium.Matrix4()
+    );
+    // 添加已有gltf模型
+    viewer.scene.primitives.add(
+      Cesium.Model.fromGltf({
+        url: "./data/models/DracoCompressed/CesiumMilkTruck.gltf",
+        modelMatrix: modelMatrix,
+        minimumPixelSize: 128,
+      })
+    );
+
+    // moveGltfModel();
+
+    Cesium.knockout
+      .getObservable(viewModel, "scale")
+      .subscribe(function (scale) {
+        scale = Number(scale);
+        if (isNaN(scale)) {
+          return;
+        }
+        setScale(); // 设置大小
+      });
+
+    Cesium.knockout
+      .getObservable(viewModel, "height")
+      .subscribe(function (height) {
+        height = Number(height);
+        if (isNaN(height)) {
+          return;
+        }
+        adjustGltfHeight(); // 调整高度
+      });
+
+    Cesium.knockout.getObservable(viewModel, "rx").subscribe(function (rx) {
+      rx = Number(rx);
+      if (isNaN(rx)) {
+        return;
+      }
+      rotateX(); // 绕X轴旋转
+    });
+
+    Cesium.knockout.getObservable(viewModel, "ry").subscribe(function (ry) {
+      ry = Number(ry);
+      if (isNaN(ry)) {
+        return;
+      }
+      rotateY(); // 绕Y轴旋转
+    });
+
+    Cesium.knockout.getObservable(viewModel, "rz").subscribe(function (rz) {
+      rz = Number(rz);
+      if (isNaN(rz)) {
+        return;
+      }
+      rotateZ(); // 绕Y轴旋转
+    });
+
+    function setScale() {
+      model.scale = Number(viewModel.scale);
+    }
+
+    function rotateX() {
+      var m = model.modelMatrix;
+      let mx = Cesium.Matrix3.fromRotationX(
+        Cesium.Math.toRadians(viewModel.rx)
+      );
+      model.modelMatrix = Cesium.Matrix4.multiplyByMatrix3(
+        m,
+        mx,
+        new Cesium.Matrix4()
+      );
+    }
+
+    function rotateY() {
+      var m = model.modelMatrix;
+      let my = Cesium.Matrix3.fromRotationY(
+        Cesium.Math.toRadians(viewModel.ry)
+      );
+      model.modelMatrix = Cesium.Matrix4.multiplyByMatrix3(
+        m,
+        my,
+        new Cesium.Matrix4()
+      );
+    }
+
+    function rotateZ() {
+      var m = model.modelMatrix;
+      let mz = Cesium.Matrix3.fromRotationZ(
+        Cesium.Math.toRadians(Number(viewModel.rz))
+      );
+      model.modelMatrix = Cesium.Matrix4.multiplyByMatrix3(
+        m,
+        mz,
+        new Cesium.Matrix4()
+      );
+    }
+
+    var handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+
+    // 单击添加模型
+    handler.setInputAction(function (evt) {
+      let cartesian = viewer.scene.pickPosition(evt.position);
+      if (Cesium.defined(cartesian)) {
+        let hpr = new Cesium.HeadingPitchRoll();
+        let modelMatrix = Cesium.Transforms.headingPitchRollToFixedFrame(
+          cartesian,
+          hpr,
+          Cesium.Ellipsoid.WGS84,
+          Cesium.Transforms.eastNorthUpToFixedFrame
+          // new Cesium.Matrix4()
+        );
+        var gltfModel = viewer.scene.primitives.add(
+          Cesium.Model.fromGltf({
+            url: "./data/models/DracoCompressed/CesiumMilkTruck.gltf",
+            // url: "./data/gltf/building.gltf",
+            modelMatrix: modelMatrix,
+            minimumPixelSize: 128,
+            scale: 1,
+          })
+        );
+        gltfModel.readyPromise.then(function (readyModel) {
+          model = readyModel;
+          handler.destroy(); //销毁左键监听事件
+        });
+      }
+    }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+    function adjustGltfHeight() {
+      let oldMatrix = model.modelMatrix; // 模型的矩阵
+      let oldCenter = new Cesium.Cartesian3(
+        oldMatrix[12],
+        oldMatrix[13],
+        oldMatrix[14]
+      ); // 模型高度调整前中心点笛卡尔坐标
+      let oldCartographic = Cesium.Cartographic.fromCartesian(oldCenter); // 高度调整前的弧度坐标
+      let newHeight = oldCartographic.height + Number(viewModel.height);
+      let newCartographic = new Cesium.Cartographic(
+        oldCartographic.longitude,
+        oldCartographic.latitude,
+        newHeight
+      ); // 高度调整后的弧度坐标
+      let newCartesian =
+        viewer.scene.globe.ellipsoid.cartographicToCartesian(newCartographic);
+      // let headingPitchRoll = new Cesium.HeadingPitchRoll(
+      //   Cesium.Math.toRadians(viewModel.rz),
+      //   Cesium.Math.toRadians(viewModel.ry),
+      //   Cesium.Math.toRadians(viewModel.rx)
+      // );
+      let headingPitchRoll = new Cesium.HeadingPitchRoll();
+      let m = Cesium.Transforms.headingPitchRollToFixedFrame(
+        newCartesian,
+        headingPitchRoll,
+        Cesium.Ellipsoid.WGS84,
+        Cesium.Transforms.eastNorthUpToFixedFrame
+        // new Cesium.Matrix4()
+      );
+      model.modelMatrix = m; // 平移变换
+    }
+
+    // 移动模型
+    function moveGltfModel() {
+      let _this = this;
+      let viewer = _this.viewer;
+      let handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
+      let pickedObject = null;
+      let leftDownFlag = false;
+      // let rtaleX = parseFloat($("#rangeRtaleX").val());
+
+      handler.setInputAction(function (movement) {
+        pickedObject = viewer.scene.pick(movement.position);
+        if (Cesium.defined(pickedObject)) {
+          if (pickedObject.primitive.isCesium3DTileset == undefined) {
+            leftDownFlag = true;
+            document.body.style.cursor = "pointer";
+            viewer.scene.screenSpaceCameraController.enableRotate = false; //锁定相机
+            pickedObject.primitive.color = new Cesium.Color(0, 1, 0, 1); //选中模型后高亮
+            pickedObject.primitive.silhouetteSize = 3.0; //选中模型后高亮
+          }
+        }
+      }, Cesium.ScreenSpaceEventType.LEFT_DOWN);
+
+      handler.setInputAction(function () {
+        pickedObject.primitive.color = new Cesium.Color(1, 1, 1, 1);
+        pickedObject.primitive.silhouetteSize = 0;
+        leftDownFlag = false;
+        pickedObject = null;
+        viewer.scene.screenSpaceCameraController.enableRotate = true; //解除锁定相机
+        document.body.style.cursor = "default";
+      }, Cesium.ScreenSpaceEventType.LEFT_UP);
+
+      handler.setInputAction((movement) => {
+        if (leftDownFlag && pickedObject.primitive.modelMatrix) {
+          // ************g关键代码：cartesian的值************
+          let ray = viewer.camera.getPickRay(movement.endPosition);
+          let cartesian = viewer.scene.globe.pick(ray, viewer.scene);
+          let headingPitchRoll = new Cesium.HeadingPitchRoll(
+            Cesium.Math.toRadians(viewModel.rz),
+            Cesium.Math.toRadians(viewModel.ry),
+            Cesium.Math.toRadians(viewModel.rx)
+          );
+          let m = Cesium.Transforms.headingPitchRollToFixedFrame(
+            cartesian,
+            headingPitchRoll,
+            Cesium.Ellipsoid.WGS84,
+            Cesium.Transforms.eastNorthUpToFixedFrame,
+            new Cesium.Matrix4()
+          );
+          pickedObject.primitive.modelMatrix = m;
+        }
+      }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+    }
+  </script>
+</body>

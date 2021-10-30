@@ -51,10 +51,10 @@
       navigationHelpButton: false, // 帮助提示，如何操作数字地球。
       navigationInstructionsInitiallyVisible: false, // 如果最初应该看到导航说明，则为true；如果直到用户明确单击该按钮，则该提示不显示，否则为false。
       // Show Columbus View map with Web Mercator projection
-      mapProjection: new Cesium.WebMercatorProjection(),
-      terrainProvider: new Cesium.CesiumTerrainProvider({
-        url: Cesium.IonResource.fromAssetId(3956),
-      }),
+      // mapProjection: new Cesium.WebMercatorProjection(),
+      // terrainProvider: new Cesium.CesiumTerrainProvider({
+      //   url: Cesium.IonResource.fromAssetId(3956),
+      // }),
     });
 
     // 隐藏logo
@@ -63,8 +63,7 @@
     // 自定义影像图层
     var imageProviderVMs = [];
     let gaodeImageProvider = new Cesium.UrlTemplateImageryProvider({
-      url:
-        "http://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}",
+      url: "http://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}",
       subdomains: ["1", "2", "3", "4"],
     });
     var gaodeVM = new Cesium.ProviderViewModel({
@@ -78,13 +77,13 @@
       },
     });
     imageProviderVMs.push(gaodeVM);
-    viewer.baseLayerPicker.viewModel.imageryProviderViewModels = imageProviderVMs;
+    viewer.baseLayerPicker.viewModel.imageryProviderViewModels =
+      imageProviderVMs;
 
     // 自定义地形图层
     var terrainProviderVMs = [];
     var terrainProvider = new Cesium.ArcGISTiledElevationTerrainProvider({
-      url:
-        "https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer",
+      url: "https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer",
       token:
         "KED1aF_I4UzXOHy3BnhwyBHU4l5oY6rO6walkmHoYqGp4XyIWUd5YZUC1ZrLAzvV40pR6gBXQayh0eFA8m6vPg..",
     });
@@ -99,6 +98,7 @@
       },
     });
     terrainProviderVMs.push(arcgisVM);
-    viewer.baseLayerPicker.viewModel.terrainProviderViewModels = terrainProviderVMs;
+    viewer.baseLayerPicker.viewModel.terrainProviderViewModels =
+      terrainProviderVMs;
   </script>
 </body>

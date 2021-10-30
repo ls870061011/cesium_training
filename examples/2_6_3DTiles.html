@@ -203,9 +203,9 @@
           boundingSphere.center
         );
         //获取模型中心点经纬度坐标
-        viewModel.longitude = Cesium.Math.toDegrees(cartographic.longitude);
-        viewModel.latitude = Cesium.Math.toDegrees(cartographic.latitude);
-        viewModel.height = cartographic.height;
+        // viewModel.longitude = Cesium.Math.toDegrees(cartographic.longitude);
+        // viewModel.latitude = Cesium.Math.toDegrees(cartographic.latitude);
+        // viewModel.height = cartographic.height;
 
         //修改3dtiles位置，input，range组件的change事件绑定此函数
         // update3dtilesMaxtrix();
@@ -230,27 +230,6 @@
             },
           });
         }
-
-        // 设置模型矩阵（调整位置）
-        // var cartographic = Cesium.Cartographic.fromCartesian(
-        //   tileset.boundingSphere.center
-        // );
-        // var surface = Cesium.Cartesian3.fromRadians(
-        //   cartographic.longitude,
-        //   cartographic.latitude,
-        //   0.0
-        // );
-        // var offset = Cesium.Cartesian3.fromRadians(
-        //   cartographic.longitude,
-        //   cartographic.latitude,
-        //   height
-        // );
-        // var translation = Cesium.Cartesian3.subtract(
-        //   offset,
-        //   surface,
-        //   new Cesium.Cartesian3()
-        // );
-        // tileset.modelMatrix = Cesium.Matrix4.fromTranslation(translation);
       })
       .otherwise(function (error) {
         console.log(error);
@@ -267,7 +246,21 @@
     Cesium.knockout
       .getObservable(viewModel, "height")
       .subscribe(function (height) {
-        adjustHeight();
+        height = Number(height);
+        if (isNaN(height)) {
+          return;
+        }
+        adjustHeight(); // 调整高度
+      });
+
+    Cesium.knockout
+      .getObservable(viewModel, "rx")
+      .subscribe(function (rx) {
+        rx = Number(rx);
+        if (isNaN(rx)) {
+          return;
+        }
+        rotatex(); // 调整高度
       });
 
     function adjustHeight() {
@@ -277,7 +270,7 @@
       var surface = Cesium.Cartesian3.fromRadians(
         cartographic.longitude,
         cartographic.latitude,
-        cartographic.height
+        0.0
       );
       var offset = Cesium.Cartesian3.fromRadians(
         cartographic.longitude,
@@ -290,6 +283,16 @@
         new Cesium.Cartesian3()
       );
       tileset.modelMatrix = Cesium.Matrix4.fromTranslation(translation);
+    }
+
+    function rotatex() {
+      var m = tileset.modelMatrix;
+      let mx = Cesium.Matrix3.fromRotationX(Cesium.Math.toRadians(viewModel.rx));
+      tileset.modelMatrix = Cesium.Matrix4.multiplyByMatrix3(
+        m,
+        mx,
+        new Cesium.Matrix4()
+      );
     }
 
     function update3dtilesMaxtrix() {
@@ -313,12 +316,12 @@
       );
       var m = Cesium.Transforms.eastNorthUpToFixedFrame(position);
       // 旋转、平移矩阵相乘
-      Cesium.Matrix4.multiply(m, rotationX, m);
-      Cesium.Matrix4.multiply(m, rotationY, m);
-      Cesium.Matrix4.multiply(m, rotationZ, m);
+      Cesium.Matrix4.multiply(m, rotationX, new Cesium.Matrix4());
+      Cesium.Matrix4.multiply(m, rotationY, new Cesium.Matrix4());
+      Cesium.Matrix4.multiply(m, rotationZ, new Cesium.Matrix4());
       // 缩放 修改缩放比例
       var scale = Cesium.Matrix4.fromUniformScale(viewModel.scale);
-      Cesium.Matrix4.multiply(m, scale, m);
+      Cesium.Matrix4.multiply(m, scale, new Cesium.Matrix4());
       // 赋值给tileset
       tileset.modelMatrix = m;
       // 调整地下透明度
@@ -333,7 +336,10 @@
     var handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
     handler.setInputAction(function (movement) {
       var feature = viewer.scene.pick(movement.position);
-      if (Cesium.defined(feature) && feature instanceof Cesium.Cesium3DTileFeature) {
+      if (
+        Cesium.defined(feature) &&
+        feature instanceof Cesium.Cesium3DTileFeature
+      ) {
         var propertyNames = feature.getPropertyNames();
         var length = propertyNames.length;
         for (var i = 0; i < length; ++i) {
@@ -344,31 +350,31 @@
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
     //高亮显示代码
-    var previousPickedEntity = {
-      feature: undefined,
-      originalColor: undefined,
-    };
-    handler.setInputAction(function (movement) {
-      var pickingEntity = viewer.scene.pick(movement.position);
-      //判断选择是否为Cesium3DTileFeature
-      if (pickingEntity instanceof Cesium.Cesium3DTileFeature) {
-        //判断以前是否选择要素
-        if (pickingEntity != previousPickedEntity.feature) {
-          if (previousPickedEntity.feature != undefined) {
-            //还原前选择要素的本颜色
-            previousPickedEntity.feature.color =
-              previousPickedEntity.originalColor;
-            //将当前选择要素及其颜色添加到previousPickedEntity
-            previousPickedEntity.feature = pickingEntity;
-            previousPickedEntity.originalColor = pickingEntity.color;
-          }
-          //将当前选择要素及其颜色添加到previousPickedEntity
-          previousPickedEntity.feature = pickingEntity;
-          previousPickedEntity.originalColor = pickingEntity.color;
-        }
-        //将模型变为黄色高亮
-        pickingEntity.color = Cesium.Color.RED;
-      }
-    }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+    // var previousPickedEntity = {
+    //   feature: undefined,
+    //   originalColor: undefined,
+    // };
+    // handler.setInputAction(function (movement) {
+    //   var pickingEntity = viewer.scene.pick(movement.position);
+    //   //判断选择是否为Cesium3DTileFeature
+    //   if (pickingEntity instanceof Cesium.Cesium3DTileFeature) {
+    //     //判断以前是否选择要素
+    //     if (pickingEntity != previousPickedEntity.feature) {
+    //       if (previousPickedEntity.feature != undefined) {
+    //         //还原前选择要素的本颜色
+    //         previousPickedEntity.feature.color =
+    //           previousPickedEntity.originalColor;
+    //         //将当前选择要素及其颜色添加到previousPickedEntity
+    //         previousPickedEntity.feature = pickingEntity;
+    //         previousPickedEntity.originalColor = pickingEntity.color;
+    //       }
+    //       //将当前选择要素及其颜色添加到previousPickedEntity
+    //       previousPickedEntity.feature = pickingEntity;
+    //       previousPickedEntity.originalColor = pickingEntity.color;
+    //     }
+    //     //将模型变为黄色高亮
+    //     pickingEntity.color = Cesium.Color.RED;
+    //   }
+    // }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
   </script>
 </body>
