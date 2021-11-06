@@ -21051,6 +21051,7 @@ export namespace KmlDataSource {
      * @property [clampToGround = false] - true if we want the geometry features (Polygons, LineStrings and LinearRings) clamped to the ground.
      * @property [ellipsoid = Ellipsoid.WGS84] - The global ellipsoid used for geographical calculations.
      * @property [credit] - A credit for the data source, which is displayed on the canvas.
+     * @property [screenOverlayContainer] - A container for ScreenOverlay images.
      */
     type LoadOptions = {
         camera: Camera;
@@ -21059,6 +21060,7 @@ export namespace KmlDataSource {
         clampToGround?: boolean;
         ellipsoid?: Ellipsoid;
         credit?: Credit | string;
+        screenOverlayContainer?: Element | string;
     };
 }
 
@@ -21166,13 +21168,19 @@ export class KmlDataSource {
      * @param [options.sourceUri] - Overrides the url to use for resolving relative links and other KML network features.
      * @param [options.clampToGround = false] - true if we want the geometry features (Polygons, LineStrings and LinearRings) clamped to the ground. If true, lines will use corridors so use Entity.corridor instead of Entity.polyline.
      * @param [options.ellipsoid = Ellipsoid.WGS84] - The global ellipsoid used for geographical calculations.
+     * @param [options.screenOverlayContainer] - A container for ScreenOverlay images.
      * @returns A promise that will resolve to this instances once the KML is loaded.
      */
     load(data: Resource | string | Document | Blob, options?: {
         sourceUri?: Resource | string;
         clampToGround?: boolean;
         ellipsoid?: Ellipsoid;
+        screenOverlayContainer?: Element | string;
     }): Promise<KmlDataSource>;
+    /**
+     * Cleans up any non-entity elements created by the data source. Currently this only affects ScreenOverlay elements.
+     */
+    destroy(): void;
     /**
      * Updates any NetworkLink that require updating.
      * @param time - The simulation time.
