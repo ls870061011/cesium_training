@@ -253,15 +253,13 @@
         adjustHeight(); // 调整高度
       });
 
-    Cesium.knockout
-      .getObservable(viewModel, "rx")
-      .subscribe(function (rx) {
-        rx = Number(rx);
-        if (isNaN(rx)) {
-          return;
-        }
-        rotatex(); // 调整高度
-      });
+    Cesium.knockout.getObservable(viewModel, "rx").subscribe(function (rx) {
+      rx = Number(rx);
+      if (isNaN(rx)) {
+        return;
+      }
+      // rotatex(); // 调整高度
+    });
 
     function adjustHeight() {
       var cartographic = Cesium.Cartographic.fromCartesian(
@@ -287,7 +285,9 @@
 
     function rotatex() {
       var m = tileset.modelMatrix;
-      let mx = Cesium.Matrix3.fromRotationX(Cesium.Math.toRadians(viewModel.rx));
+      let mx = Cesium.Matrix3.fromRotationX(
+        Cesium.Math.toRadians(viewModel.rx)
+      );
       tileset.modelMatrix = Cesium.Matrix4.multiplyByMatrix3(
         m,
         mx,
@@ -332,49 +332,43 @@
       // );
     }
 
-    // 添加鼠标拾取要素
+    //添加点击事件
+    var prePickedFeature = {
+      feature: undefined,
+      originalColor: undefined,
+    };
     var handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
     handler.setInputAction(function (movement) {
-      var feature = viewer.scene.pick(movement.position);
+      var pickedFeature = viewer.scene.pick(movement.position);
+      //判断选择是否为Cesium3DTileFeature
       if (
         Cesium.defined(feature) &&
-        feature instanceof Cesium.Cesium3DTileFeature
+        pickedFeature instanceof Cesium.Cesium3DTileFeature
       ) {
+        // 获取要素属性
         var propertyNames = feature.getPropertyNames();
         var length = propertyNames.length;
         for (var i = 0; i < length; ++i) {
           var propertyName = propertyNames[i];
           console.log(propertyName + ": " + feature.getProperty(propertyName));
         }
+
+        //选择要素高亮显示
+        if (pickedFeature != prePickedFeature.feature) {
+          if (prePickedFeature.feature != undefined) {
+            //还原前选择要素的本颜色
+            prePickedFeature.feature.color = prePickedFeature.originalColor;
+            //将当前选择要素及其颜色添加到prePickedFeature
+            prePickedFeature.feature = pickedFeature;
+            prePickedFeature.originalColor = pickedFeature.color;
+          }
+          //将当前选择要素及其颜色添加到prePickedFeature
+          prePickedFeature.feature = pickedFeature;
+          prePickedFeature.originalColor = pickedFeature.color;
+        }
+        //将模型变为黄色高亮
+        pickedFeature.color = Cesium.Color.RED;
       }
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
-
-    //高亮显示代码
-    // var previousPickedEntity = {
-    //   feature: undefined,
-    //   originalColor: undefined,
-    // };
-    // handler.setInputAction(function (movement) {
-    //   var pickingEntity = viewer.scene.pick(movement.position);
-    //   //判断选择是否为Cesium3DTileFeature
-    //   if (pickingEntity instanceof Cesium.Cesium3DTileFeature) {
-    //     //判断以前是否选择要素
-    //     if (pickingEntity != previousPickedEntity.feature) {
-    //       if (previousPickedEntity.feature != undefined) {
-    //         //还原前选择要素的本颜色
-    //         previousPickedEntity.feature.color =
-    //           previousPickedEntity.originalColor;
-    //         //将当前选择要素及其颜色添加到previousPickedEntity
-    //         previousPickedEntity.feature = pickingEntity;
-    //         previousPickedEntity.originalColor = pickingEntity.color;
-    //       }
-    //       //将当前选择要素及其颜色添加到previousPickedEntity
-    //       previousPickedEntity.feature = pickingEntity;
-    //       previousPickedEntity.originalColor = pickingEntity.color;
-    //     }
-    //     //将模型变为黄色高亮
-    //     pickingEntity.color = Cesium.Color.RED;
-    //   }
-    // }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
   </script>
 </body>
