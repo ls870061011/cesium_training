@@ -1,1 +1,275 @@
-define(["./when-4bbc8319","./Transforms-f15de320","./Matrix2-c6c16658","./RuntimeError-5b082e8f","./ComponentDatatype-3d0a0aac","./FrustumGeometry-3c5b2b26","./GeometryAttribute-8350368e","./GeometryAttributes-7827a6c2","./combine-e9466e32","./WebGLConstants-508b9636","./Plane-26e67b94","./VertexFormat-7b982b01"],(function(e,t,r,n,a,i,u,o,c,s,p,m){"use strict";function h(n){const a=n.frustum,u=n.orientation,o=n.origin,c=e.defaultValue(n._drawNearPlane,!0);let s,p;a instanceof i.PerspectiveFrustum?(s=0,p=i.PerspectiveFrustum.packedLength):a instanceof i.OrthographicFrustum&&(s=1,p=i.OrthographicFrustum.packedLength),this._frustumType=s,this._frustum=a.clone(),this._origin=r.Cartesian3.clone(o),this._orientation=t.Quaternion.clone(u),this._drawNearPlane=c,this._workerName="createFrustumOutlineGeometry",this.packedLength=2+p+r.Cartesian3.packedLength+t.Quaternion.packedLength}h.pack=function(n,a,u){u=e.defaultValue(u,0);const o=n._frustumType,c=n._frustum;return a[u++]=o,0===o?(i.PerspectiveFrustum.pack(c,a,u),u+=i.PerspectiveFrustum.packedLength):(i.OrthographicFrustum.pack(c,a,u),u+=i.OrthographicFrustum.packedLength),r.Cartesian3.pack(n._origin,a,u),u+=r.Cartesian3.packedLength,t.Quaternion.pack(n._orientation,a,u),a[u+=t.Quaternion.packedLength]=n._drawNearPlane?1:0,a};const d=new i.PerspectiveFrustum,f=new i.OrthographicFrustum,g=new t.Quaternion,_=new r.Cartesian3;return h.unpack=function(n,a,u){a=e.defaultValue(a,0);const o=n[a++];let c;0===o?(c=i.PerspectiveFrustum.unpack(n,a,d),a+=i.PerspectiveFrustum.packedLength):(c=i.OrthographicFrustum.unpack(n,a,f),a+=i.OrthographicFrustum.packedLength);const s=r.Cartesian3.unpack(n,a,_);a+=r.Cartesian3.packedLength;const p=t.Quaternion.unpack(n,a,g),m=1===n[a+=t.Quaternion.packedLength];if(!e.defined(u))return new h({frustum:c,origin:s,orientation:p,_drawNearPlane:m});const l=o===u._frustumType?u._frustum:void 0;return u._frustum=c.clone(l),u._frustumType=o,u._origin=r.Cartesian3.clone(s,u._origin),u._orientation=t.Quaternion.clone(p,u._orientation),u._drawNearPlane=m,u},h.createGeometry=function(e){const r=e._frustumType,n=e._frustum,c=e._origin,s=e._orientation,p=e._drawNearPlane,m=new Float64Array(24);i.FrustumGeometry._computeNearFarPlanes(c,s,r,n,m);const h=new o.GeometryAttributes({position:new u.GeometryAttribute({componentDatatype:a.ComponentDatatype.DOUBLE,componentsPerAttribute:3,values:m})});let d,f;const g=p?2:1,_=new Uint16Array(8*(g+1));let l=p?0:1;for(;l<2;++l)d=p?8*l:0,f=4*l,_[d]=f,_[d+1]=f+1,_[d+2]=f+1,_[d+3]=f+2,_[d+4]=f+2,_[d+5]=f+3,_[d+6]=f+3,_[d+7]=f;for(l=0;l<2;++l)d=8*(g+l),f=4*l,_[d]=f,_[d+1]=f+4,_[d+2]=f+1,_[d+3]=f+5,_[d+4]=f+2,_[d+5]=f+6,_[d+6]=f+3,_[d+7]=f+7;return new u.Geometry({attributes:h,indices:_,primitiveType:u.PrimitiveType.LINES,boundingSphere:t.BoundingSphere.fromVertices(m)})},function(t,r){return e.defined(r)&&(t=h.unpack(t,r)),h.createGeometry(t)}}));
+/**
+ * Cesium - https://github.com/CesiumGS/cesium
+ *
+ * Copyright 2011-2020 Cesium Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Columbus View (Pat. Pend.)
+ *
+ * Portions licensed separately.
+ * See https://github.com/CesiumGS/cesium/blob/main/LICENSE.md for full licensing details.
+ */
+
+define(['./defaultValue-81eec7ed', './Transforms-f0a54c7b', './Matrix2-d35cf4b5', './RuntimeError-8952249c', './ComponentDatatype-9e86ac8f', './FrustumGeometry-aa6726d2', './GeometryAttribute-eeb38987', './GeometryAttributes-32b29525', './_commonjsHelpers-3aae1032-26891ab7', './combine-3c023bda', './WebGLConstants-508b9636', './Plane-24f22488', './VertexFormat-7df34ea5'], (function (defaultValue, Transforms, Matrix2, RuntimeError, ComponentDatatype, FrustumGeometry, GeometryAttribute, GeometryAttributes, _commonjsHelpers3aae1032, combine, WebGLConstants, Plane, VertexFormat) { 'use strict';
+
+  const PERSPECTIVE = 0;
+  const ORTHOGRAPHIC = 1;
+
+  /**
+   * A description of the outline of a frustum with the given the origin and orientation.
+   *
+   * @alias FrustumOutlineGeometry
+   * @constructor
+   *
+   * @param {Object} options Object with the following properties:
+   * @param {PerspectiveFrustum|OrthographicFrustum} options.frustum The frustum.
+   * @param {Cartesian3} options.origin The origin of the frustum.
+   * @param {Quaternion} options.orientation The orientation of the frustum.
+   */
+  function FrustumOutlineGeometry(options) {
+    //>>includeStart('debug', pragmas.debug);
+    RuntimeError.Check.typeOf.object("options", options);
+    RuntimeError.Check.typeOf.object("options.frustum", options.frustum);
+    RuntimeError.Check.typeOf.object("options.origin", options.origin);
+    RuntimeError.Check.typeOf.object("options.orientation", options.orientation);
+    //>>includeEnd('debug');
+
+    const frustum = options.frustum;
+    const orientation = options.orientation;
+    const origin = options.origin;
+
+    // This is private because it is used by DebugCameraPrimitive to draw a multi-frustum by
+    // creating multiple FrustumOutlineGeometrys. This way the near plane of one frustum doesn't overlap
+    // the far plane of another.
+    const drawNearPlane = defaultValue.defaultValue(options._drawNearPlane, true);
+
+    let frustumType;
+    let frustumPackedLength;
+    if (frustum instanceof FrustumGeometry.PerspectiveFrustum) {
+      frustumType = PERSPECTIVE;
+      frustumPackedLength = FrustumGeometry.PerspectiveFrustum.packedLength;
+    } else if (frustum instanceof FrustumGeometry.OrthographicFrustum) {
+      frustumType = ORTHOGRAPHIC;
+      frustumPackedLength = FrustumGeometry.OrthographicFrustum.packedLength;
+    }
+
+    this._frustumType = frustumType;
+    this._frustum = frustum.clone();
+    this._origin = Matrix2.Cartesian3.clone(origin);
+    this._orientation = Transforms.Quaternion.clone(orientation);
+    this._drawNearPlane = drawNearPlane;
+    this._workerName = "createFrustumOutlineGeometry";
+
+    /**
+     * The number of elements used to pack the object into an array.
+     * @type {Number}
+     */
+    this.packedLength =
+      2 + frustumPackedLength + Matrix2.Cartesian3.packedLength + Transforms.Quaternion.packedLength;
+  }
+
+  /**
+   * Stores the provided instance into the provided array.
+   *
+   * @param {FrustumOutlineGeometry} value The value to pack.
+   * @param {Number[]} array The array to pack into.
+   * @param {Number} [startingIndex=0] The index into the array at which to start packing the elements.
+   *
+   * @returns {Number[]} The array that was packed into
+   */
+  FrustumOutlineGeometry.pack = function (value, array, startingIndex) {
+    //>>includeStart('debug', pragmas.debug);
+    RuntimeError.Check.typeOf.object("value", value);
+    RuntimeError.Check.defined("array", array);
+    //>>includeEnd('debug');
+
+    startingIndex = defaultValue.defaultValue(startingIndex, 0);
+
+    const frustumType = value._frustumType;
+    const frustum = value._frustum;
+
+    array[startingIndex++] = frustumType;
+
+    if (frustumType === PERSPECTIVE) {
+      FrustumGeometry.PerspectiveFrustum.pack(frustum, array, startingIndex);
+      startingIndex += FrustumGeometry.PerspectiveFrustum.packedLength;
+    } else {
+      FrustumGeometry.OrthographicFrustum.pack(frustum, array, startingIndex);
+      startingIndex += FrustumGeometry.OrthographicFrustum.packedLength;
+    }
+
+    Matrix2.Cartesian3.pack(value._origin, array, startingIndex);
+    startingIndex += Matrix2.Cartesian3.packedLength;
+    Transforms.Quaternion.pack(value._orientation, array, startingIndex);
+    startingIndex += Transforms.Quaternion.packedLength;
+    array[startingIndex] = value._drawNearPlane ? 1.0 : 0.0;
+
+    return array;
+  };
+
+  const scratchPackPerspective = new FrustumGeometry.PerspectiveFrustum();
+  const scratchPackOrthographic = new FrustumGeometry.OrthographicFrustum();
+  const scratchPackQuaternion = new Transforms.Quaternion();
+  const scratchPackorigin = new Matrix2.Cartesian3();
+
+  /**
+   * Retrieves an instance from a packed array.
+   *
+   * @param {Number[]} array The packed array.
+   * @param {Number} [startingIndex=0] The starting index of the element to be unpacked.
+   * @param {FrustumOutlineGeometry} [result] The object into which to store the result.
+   */
+  FrustumOutlineGeometry.unpack = function (array, startingIndex, result) {
+    //>>includeStart('debug', pragmas.debug);
+    RuntimeError.Check.defined("array", array);
+    //>>includeEnd('debug');
+
+    startingIndex = defaultValue.defaultValue(startingIndex, 0);
+
+    const frustumType = array[startingIndex++];
+
+    let frustum;
+    if (frustumType === PERSPECTIVE) {
+      frustum = FrustumGeometry.PerspectiveFrustum.unpack(
+        array,
+        startingIndex,
+        scratchPackPerspective
+      );
+      startingIndex += FrustumGeometry.PerspectiveFrustum.packedLength;
+    } else {
+      frustum = FrustumGeometry.OrthographicFrustum.unpack(
+        array,
+        startingIndex,
+        scratchPackOrthographic
+      );
+      startingIndex += FrustumGeometry.OrthographicFrustum.packedLength;
+    }
+
+    const origin = Matrix2.Cartesian3.unpack(array, startingIndex, scratchPackorigin);
+    startingIndex += Matrix2.Cartesian3.packedLength;
+    const orientation = Transforms.Quaternion.unpack(
+      array,
+      startingIndex,
+      scratchPackQuaternion
+    );
+    startingIndex += Transforms.Quaternion.packedLength;
+    const drawNearPlane = array[startingIndex] === 1.0;
+
+    if (!defaultValue.defined(result)) {
+      return new FrustumOutlineGeometry({
+        frustum: frustum,
+        origin: origin,
+        orientation: orientation,
+        _drawNearPlane: drawNearPlane,
+      });
+    }
+
+    const frustumResult =
+      frustumType === result._frustumType ? result._frustum : undefined;
+    result._frustum = frustum.clone(frustumResult);
+
+    result._frustumType = frustumType;
+    result._origin = Matrix2.Cartesian3.clone(origin, result._origin);
+    result._orientation = Transforms.Quaternion.clone(orientation, result._orientation);
+    result._drawNearPlane = drawNearPlane;
+
+    return result;
+  };
+
+  /**
+   * Computes the geometric representation of a frustum outline, including its vertices, indices, and a bounding sphere.
+   *
+   * @param {FrustumOutlineGeometry} frustumGeometry A description of the frustum.
+   * @returns {Geometry|undefined} The computed vertices and indices.
+   */
+  FrustumOutlineGeometry.createGeometry = function (frustumGeometry) {
+    const frustumType = frustumGeometry._frustumType;
+    const frustum = frustumGeometry._frustum;
+    const origin = frustumGeometry._origin;
+    const orientation = frustumGeometry._orientation;
+    const drawNearPlane = frustumGeometry._drawNearPlane;
+
+    const positions = new Float64Array(3 * 4 * 2);
+    FrustumGeometry.FrustumGeometry._computeNearFarPlanes(
+      origin,
+      orientation,
+      frustumType,
+      frustum,
+      positions
+    );
+
+    const attributes = new GeometryAttributes.GeometryAttributes({
+      position: new GeometryAttribute.GeometryAttribute({
+        componentDatatype: ComponentDatatype.ComponentDatatype.DOUBLE,
+        componentsPerAttribute: 3,
+        values: positions,
+      }),
+    });
+
+    let offset;
+    let index;
+
+    const numberOfPlanes = drawNearPlane ? 2 : 1;
+    const indices = new Uint16Array(8 * (numberOfPlanes + 1));
+
+    // Build the near/far planes
+    let i = drawNearPlane ? 0 : 1;
+    for (; i < 2; ++i) {
+      offset = drawNearPlane ? i * 8 : 0;
+      index = i * 4;
+
+      indices[offset] = index;
+      indices[offset + 1] = index + 1;
+      indices[offset + 2] = index + 1;
+      indices[offset + 3] = index + 2;
+      indices[offset + 4] = index + 2;
+      indices[offset + 5] = index + 3;
+      indices[offset + 6] = index + 3;
+      indices[offset + 7] = index;
+    }
+
+    // Build the sides of the frustums
+    for (i = 0; i < 2; ++i) {
+      offset = (numberOfPlanes + i) * 8;
+      index = i * 4;
+
+      indices[offset] = index;
+      indices[offset + 1] = index + 4;
+      indices[offset + 2] = index + 1;
+      indices[offset + 3] = index + 5;
+      indices[offset + 4] = index + 2;
+      indices[offset + 5] = index + 6;
+      indices[offset + 6] = index + 3;
+      indices[offset + 7] = index + 7;
+    }
+
+    return new GeometryAttribute.Geometry({
+      attributes: attributes,
+      indices: indices,
+      primitiveType: GeometryAttribute.PrimitiveType.LINES,
+      boundingSphere: Transforms.BoundingSphere.fromVertices(positions),
+    });
+  };
+
+  function createFrustumOutlineGeometry(frustumGeometry, offset) {
+    if (defaultValue.defined(offset)) {
+      frustumGeometry = FrustumOutlineGeometry.unpack(frustumGeometry, offset);
+    }
+    return FrustumOutlineGeometry.createGeometry(frustumGeometry);
+  }
+
+  return createFrustumOutlineGeometry;
+
+}));
+//# sourceMappingURL=createFrustumOutlineGeometry.js.map

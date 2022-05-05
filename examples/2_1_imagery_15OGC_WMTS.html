@@ -71,16 +71,30 @@
     // });
     // imageryLayers.addImageryProvider(shadedRelief1);
 
-    var tianditu = new Cesium.WebMapTileServiceImageryProvider({
+    // 天地图影像底图
+    var tianditu_cia = new Cesium.WebMapTileServiceImageryProvider({
       url:
-        "http://t0.tianditu.gov.cn/cia_w/wmts?service=WMTS&version=1.0.0&request=GetTile&tilematrix={TileMatrix}&layer=cia&style={style}&tilerow={TileRow}&tilecol={TileCol}&tilematrixset={TileMatrixSet}&format=tiles&tk=f70f0b1c42e7fdd3ba0e5e3fe6b99ec5",
+        "http://t0.tianditu.gov.cn/img_c/wmts?tk=f70f0b1c42e7fdd3ba0e5e3fe6b99ec5",
+      layer: "img",
+      style: "default",
+      format: "tiles",
+      tileMatrixSetID: "c",
+      subdomains: ["t0", "t1", "t2", "t3", "t4", "t5", "t6", "t7"], //天地图8个服务器
+    });
+    imageryLayers.addImageryProvider(tianditu_cia);
+
+
+    // 天地图影像注记
+    var tianditu_cia = new Cesium.WebMapTileServiceImageryProvider({
+      url:
+        "http://t0.tianditu.gov.cn/cia_c/wmts?tk=f70f0b1c42e7fdd3ba0e5e3fe6b99ec5",
       layer: "cia",
       style: "default",
       format: "tiles",
-      tileMatrixSetID: "w",
+      tileMatrixSetID: "c",
       subdomains: ["t0", "t1", "t2", "t3", "t4", "t5", "t6", "t7"], //天地图8个服务器
     });
-    imageryLayers.addImageryProvider(tianditu);
+    imageryLayers.addImageryProvider(tianditu_cia);
 
     // Example 2. USGS shaded relief tiles (RESTful)
     // var shadedRelief2 = new Cesium.WebMapTileServiceImageryProvider({

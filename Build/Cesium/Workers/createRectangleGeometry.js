@@ -1,1 +1,1501 @@
-define(["./when-4bbc8319","./Matrix2-c6c16658","./GeometryOffsetAttribute-821af768","./Transforms-f15de320","./RuntimeError-5b082e8f","./ComponentDatatype-3d0a0aac","./GeometryAttribute-8350368e","./GeometryAttributes-7827a6c2","./GeometryInstance-0b07c761","./GeometryPipeline-0fb7cb2c","./IndexDatatype-ddbc25a7","./PolygonPipeline-ff4d4077","./RectangleGeometryLibrary-7bc589a2","./VertexFormat-7b982b01","./combine-e9466e32","./WebGLConstants-508b9636","./AttributeCompression-f7a901f9","./EncodedCartesian3-b1495e46","./IntersectionTests-a4e54d9a","./Plane-26e67b94","./EllipsoidRhumbLine-c6741351"],(function(t,e,n,a,o,r,i,s,l,u,c,m,p,d,g,y,f,h,b,_,A){"use strict";const x=new e.Cartesian3,w=new e.Cartesian3,C=new e.Cartesian3,v=new e.Cartesian3,R=new e.Rectangle,E=new e.Cartesian2,F=new a.BoundingSphere,G=new a.BoundingSphere;function P(t,e){const n=new i.Geometry({attributes:new s.GeometryAttributes,primitiveType:i.PrimitiveType.TRIANGLES});return n.attributes.position=new i.GeometryAttribute({componentDatatype:r.ComponentDatatype.DOUBLE,componentsPerAttribute:3,values:e.positions}),t.normal&&(n.attributes.normal=new i.GeometryAttribute({componentDatatype:r.ComponentDatatype.FLOAT,componentsPerAttribute:3,values:e.normals})),t.tangent&&(n.attributes.tangent=new i.GeometryAttribute({componentDatatype:r.ComponentDatatype.FLOAT,componentsPerAttribute:3,values:e.tangents})),t.bitangent&&(n.attributes.bitangent=new i.GeometryAttribute({componentDatatype:r.ComponentDatatype.FLOAT,componentsPerAttribute:3,values:e.bitangents})),n}const V=new e.Cartesian3,L=new e.Cartesian3;function D(t,n){const a=t._vertexFormat,o=t._ellipsoid,s=n.height,l=n.width,u=n.northCap,m=n.southCap;let d=0,g=s,y=s,f=0;u&&(d=1,y-=1,f+=1),m&&(g-=1,y-=1,f+=1),f+=l*y;const h=a.position?new Float64Array(3*f):void 0,b=a.st?new Float32Array(2*f):void 0;let _=0,A=0;const R=x,F=E;let G=Number.MAX_VALUE,V=Number.MAX_VALUE,L=-Number.MAX_VALUE,D=-Number.MAX_VALUE;for(let t=d;t<g;++t)for(let e=0;e<l;++e)p.RectangleGeometryLibrary.computePosition(n,o,a.st,t,e,R,F),h[_++]=R.x,h[_++]=R.y,h[_++]=R.z,a.st&&(b[A++]=F.x,b[A++]=F.y,G=Math.min(G,F.x),V=Math.min(V,F.y),L=Math.max(L,F.x),D=Math.max(D,F.y));if(u&&(p.RectangleGeometryLibrary.computePosition(n,o,a.st,0,0,R,F),h[_++]=R.x,h[_++]=R.y,h[_++]=R.z,a.st&&(b[A++]=F.x,b[A++]=F.y,G=F.x,V=F.y,L=F.x,D=F.y)),m&&(p.RectangleGeometryLibrary.computePosition(n,o,a.st,s-1,0,R,F),h[_++]=R.x,h[_++]=R.y,h[_]=R.z,a.st&&(b[A++]=F.x,b[A]=F.y,G=Math.min(G,F.x),V=Math.min(V,F.y),L=Math.max(L,F.x),D=Math.max(D,F.y))),a.st&&(G<0||V<0||L>1||D>1))for(let t=0;t<b.length;t+=2)b[t]=(b[t]-G)/(L-G),b[t+1]=(b[t+1]-V)/(D-V);const M=function(t,n,a,o){const r=t.length,i=n.normal?new Float32Array(r):void 0,s=n.tangent?new Float32Array(r):void 0,l=n.bitangent?new Float32Array(r):void 0;let u=0;const c=v,m=C;let p=w;if(n.normal||n.tangent||n.bitangent)for(let d=0;d<r;d+=3){const r=e.Cartesian3.fromArray(t,d,x),g=u+1,y=u+2;p=a.geodeticSurfaceNormal(r,p),(n.tangent||n.bitangent)&&(e.Cartesian3.cross(e.Cartesian3.UNIT_Z,p,m),e.Matrix3.multiplyByVector(o,m,m),e.Cartesian3.normalize(m,m),n.bitangent&&e.Cartesian3.normalize(e.Cartesian3.cross(p,m,c),c)),n.normal&&(i[u]=p.x,i[g]=p.y,i[y]=p.z),n.tangent&&(s[u]=m.x,s[g]=m.y,s[y]=m.z),n.bitangent&&(l[u]=c.x,l[g]=c.y,l[y]=c.z),u+=3}return P(n,{positions:t,normals:i,tangents:s,bitangents:l})}(h,a,o,n.tangentRotationMatrix);let T=6*(l-1)*(y-1);u&&(T+=3*(l-1)),m&&(T+=3*(l-1));const O=c.IndexDatatype.createTypedArray(f,T);let N,S=0,I=0;for(N=0;N<y-1;++N){for(let t=0;t<l-1;++t){const t=S,e=t+l,n=e+1,a=t+1;O[I++]=t,O[I++]=e,O[I++]=a,O[I++]=a,O[I++]=e,O[I++]=n,++S}++S}if(u||m){let t=f-1;const e=f-1;let n,a;if(u&&m&&(t=f-2),S=0,u)for(N=0;N<l-1;N++)n=S,a=n+1,O[I++]=t,O[I++]=n,O[I++]=a,++S;if(m)for(S=(y-1)*l,N=0;N<l-1;N++)n=S,a=n+1,O[I++]=n,O[I++]=e,O[I++]=a,++S}return M.indices=O,a.st&&(M.attributes.st=new i.GeometryAttribute({componentDatatype:r.ComponentDatatype.FLOAT,componentsPerAttribute:2,values:b})),M}function M(t,e,n,a,o){return t[e++]=a[n],t[e++]=a[n+1],t[e++]=a[n+2],t[e++]=o[n],t[e++]=o[n+1],t[e]=o[n+2],t}function T(t,e,n,a){return t[e++]=a[n],t[e++]=a[n+1],t[e++]=a[n],t[e]=a[n+1],t}const O=new d.VertexFormat;function N(a,o){const s=a._shadowVolume,p=a._offsetAttribute,g=a._vertexFormat,y=a._extrudedHeight,f=a._surfaceHeight,h=a._ellipsoid,b=o.height,_=o.width;let A;if(s){const t=d.VertexFormat.clone(g,O);t.normal=!0,a._vertexFormat=t}const R=D(a,o);s&&(a._vertexFormat=g);let E=m.PolygonPipeline.scaleToGeodeticHeight(R.attributes.position.values,f,h,!1);E=new Float64Array(E);let F=E.length;const G=2*F,N=new Float64Array(G);N.set(E);const S=m.PolygonPipeline.scaleToGeodeticHeight(R.attributes.position.values,y,h);N.set(S,F),R.attributes.position.values=N;const I=g.normal?new Float32Array(G):void 0,k=g.tangent?new Float32Array(G):void 0,H=g.bitangent?new Float32Array(G):void 0,z=g.st?new Float32Array(G/3*2):void 0;let B,U,Y;if(g.normal){for(U=R.attributes.normal.values,I.set(U),A=0;A<F;A++)U[A]=-U[A];I.set(U,F),R.attributes.normal.values=I}if(s){U=R.attributes.normal.values,g.normal||(R.attributes.normal=void 0);const t=new Float32Array(G);for(A=0;A<F;A++)U[A]=-U[A];t.set(U,F),R.attributes.extrudeDirection=new i.GeometryAttribute({componentDatatype:r.ComponentDatatype.FLOAT,componentsPerAttribute:3,values:t})}const q=t.defined(p);if(q){const t=F/3*2;let e=new Uint8Array(t);p===n.GeometryOffsetAttribute.TOP?e=n.arrayFill(e,1,0,t/2):(Y=p===n.GeometryOffsetAttribute.NONE?0:1,e=n.arrayFill(e,Y)),R.attributes.applyOffset=new i.GeometryAttribute({componentDatatype:r.ComponentDatatype.UNSIGNED_BYTE,componentsPerAttribute:1,values:e})}if(g.tangent){const t=R.attributes.tangent.values;for(k.set(t),A=0;A<F;A++)t[A]=-t[A];k.set(t,F),R.attributes.tangent.values=k}if(g.bitangent){const t=R.attributes.bitangent.values;H.set(t),H.set(t,F),R.attributes.bitangent.values=H}g.st&&(B=R.attributes.st.values,z.set(B),z.set(B,F/3*2),R.attributes.st.values=z);const X=R.indices,Q=X.length,W=F/3,J=c.IndexDatatype.createTypedArray(G/3,2*Q);for(J.set(X),A=0;A<Q;A+=3)J[A+Q]=X[A+2]+W,J[A+1+Q]=X[A+1]+W,J[A+2+Q]=X[A]+W;R.indices=J;const j=o.northCap,Z=o.southCap;let K=b,$=2,tt=0,et=4,nt=4;j&&($-=1,K-=1,tt+=1,et-=2,nt-=1),Z&&($-=1,K-=1,tt+=1,et-=2,nt-=1),tt+=$*_+2*K-et;const at=2*(tt+nt);let ot=new Float64Array(3*at);const rt=s?new Float32Array(3*at):void 0;let it=q?new Uint8Array(at):void 0,st=g.st?new Float32Array(2*at):void 0;const lt=p===n.GeometryOffsetAttribute.TOP;q&&!lt&&(Y=p===n.GeometryOffsetAttribute.ALL?1:0,it=n.arrayFill(it,Y));let ut=0,ct=0,mt=0,pt=0;const dt=_*K;let gt;for(A=0;A<dt;A+=_)gt=3*A,ot=M(ot,ut,gt,E,S),ut+=6,g.st&&(st=T(st,ct,2*A,B),ct+=4),s&&(mt+=3,rt[mt++]=U[gt],rt[mt++]=U[gt+1],rt[mt++]=U[gt+2]),lt&&(it[pt++]=1,pt+=1);if(Z){const t=j?dt+1:dt;for(gt=3*t,A=0;A<2;A++)ot=M(ot,ut,gt,E,S),ut+=6,g.st&&(st=T(st,ct,2*t,B),ct+=4),s&&(mt+=3,rt[mt++]=U[gt],rt[mt++]=U[gt+1],rt[mt++]=U[gt+2]),lt&&(it[pt++]=1,pt+=1)}else for(A=dt-_;A<dt;A++)gt=3*A,ot=M(ot,ut,gt,E,S),ut+=6,g.st&&(st=T(st,ct,2*A,B),ct+=4),s&&(mt+=3,rt[mt++]=U[gt],rt[mt++]=U[gt+1],rt[mt++]=U[gt+2]),lt&&(it[pt++]=1,pt+=1);for(A=dt-1;A>0;A-=_)gt=3*A,ot=M(ot,ut,gt,E,S),ut+=6,g.st&&(st=T(st,ct,2*A,B),ct+=4),s&&(mt+=3,rt[mt++]=U[gt],rt[mt++]=U[gt+1],rt[mt++]=U[gt+2]),lt&&(it[pt++]=1,pt+=1);if(j){const t=dt;for(gt=3*t,A=0;A<2;A++)ot=M(ot,ut,gt,E,S),ut+=6,g.st&&(st=T(st,ct,2*t,B),ct+=4),s&&(mt+=3,rt[mt++]=U[gt],rt[mt++]=U[gt+1],rt[mt++]=U[gt+2]),lt&&(it[pt++]=1,pt+=1)}else for(A=_-1;A>=0;A--)gt=3*A,ot=M(ot,ut,gt,E,S),ut+=6,g.st&&(st=T(st,ct,2*A,B),ct+=4),s&&(mt+=3,rt[mt++]=U[gt],rt[mt++]=U[gt+1],rt[mt++]=U[gt+2]),lt&&(it[pt++]=1,pt+=1);let yt=function(t,n,a){const o=t.length,i=n.normal?new Float32Array(o):void 0,s=n.tangent?new Float32Array(o):void 0,l=n.bitangent?new Float32Array(o):void 0;let u=0,c=0,m=0,p=!0,d=v,g=C,y=w;if(n.normal||n.tangent||n.bitangent)for(let f=0;f<o;f+=6){const h=e.Cartesian3.fromArray(t,f,x),b=e.Cartesian3.fromArray(t,(f+6)%o,V);if(p){const n=e.Cartesian3.fromArray(t,(f+3)%o,L);e.Cartesian3.subtract(b,h,b),e.Cartesian3.subtract(n,h,n),y=e.Cartesian3.normalize(e.Cartesian3.cross(n,b,y),y),p=!1}e.Cartesian3.equalsEpsilon(b,h,r.CesiumMath.EPSILON10)&&(p=!0),(n.tangent||n.bitangent)&&(d=a.geodeticSurfaceNormal(h,d),n.tangent&&(g=e.Cartesian3.normalize(e.Cartesian3.cross(d,y,g),g))),n.normal&&(i[u++]=y.x,i[u++]=y.y,i[u++]=y.z,i[u++]=y.x,i[u++]=y.y,i[u++]=y.z),n.tangent&&(s[c++]=g.x,s[c++]=g.y,s[c++]=g.z,s[c++]=g.x,s[c++]=g.y,s[c++]=g.z),n.bitangent&&(l[m++]=d.x,l[m++]=d.y,l[m++]=d.z,l[m++]=d.x,l[m++]=d.y,l[m++]=d.z)}return P(n,{positions:t,normals:i,tangents:s,bitangents:l})}(ot,g,h);g.st&&(yt.attributes.st=new i.GeometryAttribute({componentDatatype:r.ComponentDatatype.FLOAT,componentsPerAttribute:2,values:st})),s&&(yt.attributes.extrudeDirection=new i.GeometryAttribute({componentDatatype:r.ComponentDatatype.FLOAT,componentsPerAttribute:3,values:rt})),q&&(yt.attributes.applyOffset=new i.GeometryAttribute({componentDatatype:r.ComponentDatatype.UNSIGNED_BYTE,componentsPerAttribute:1,values:it}));const ft=c.IndexDatatype.createTypedArray(at,6*tt);let ht,bt,_t,At;F=ot.length/3;let xt=0;for(A=0;A<F-1;A+=2){ht=A,At=(ht+2)%F;const t=e.Cartesian3.fromArray(ot,3*ht,V),n=e.Cartesian3.fromArray(ot,3*At,L);e.Cartesian3.equalsEpsilon(t,n,r.CesiumMath.EPSILON10)||(bt=(ht+1)%F,_t=(bt+2)%F,ft[xt++]=ht,ft[xt++]=bt,ft[xt++]=At,ft[xt++]=At,ft[xt++]=bt,ft[xt++]=_t)}return yt.indices=ft,yt=u.GeometryPipeline.combineInstances([new l.GeometryInstance({geometry:R}),new l.GeometryInstance({geometry:yt})]),yt[0]}const S=[new e.Cartesian3,new e.Cartesian3,new e.Cartesian3,new e.Cartesian3],I=new e.Cartographic,k=new e.Cartographic;function H(t,n,a,o,r){if(0===a)return e.Rectangle.clone(t,r);const i=p.RectangleGeometryLibrary.computeOptions(t,n,a,0,R,I),s=i.height,l=i.width,u=S;return p.RectangleGeometryLibrary.computePosition(i,o,!1,0,0,u[0]),p.RectangleGeometryLibrary.computePosition(i,o,!1,0,l-1,u[1]),p.RectangleGeometryLibrary.computePosition(i,o,!1,s-1,0,u[2]),p.RectangleGeometryLibrary.computePosition(i,o,!1,s-1,l-1,u[3]),e.Rectangle.fromCartesianArray(u,o,r)}function z(n){const a=(n=t.defaultValue(n,t.defaultValue.EMPTY_OBJECT)).rectangle,o=t.defaultValue(n.height,0),i=t.defaultValue(n.extrudedHeight,o);this._rectangle=e.Rectangle.clone(a),this._granularity=t.defaultValue(n.granularity,r.CesiumMath.RADIANS_PER_DEGREE),this._ellipsoid=e.Ellipsoid.clone(t.defaultValue(n.ellipsoid,e.Ellipsoid.WGS84)),this._surfaceHeight=Math.max(o,i),this._rotation=t.defaultValue(n.rotation,0),this._stRotation=t.defaultValue(n.stRotation,0),this._vertexFormat=d.VertexFormat.clone(t.defaultValue(n.vertexFormat,d.VertexFormat.DEFAULT)),this._extrudedHeight=Math.min(o,i),this._shadowVolume=t.defaultValue(n.shadowVolume,!1),this._workerName="createRectangleGeometry",this._offsetAttribute=n.offsetAttribute,this._rotatedRectangle=void 0,this._textureCoordinateRotationPoints=void 0}z.packedLength=e.Rectangle.packedLength+e.Ellipsoid.packedLength+d.VertexFormat.packedLength+7,z.pack=function(n,a,o){return o=t.defaultValue(o,0),e.Rectangle.pack(n._rectangle,a,o),o+=e.Rectangle.packedLength,e.Ellipsoid.pack(n._ellipsoid,a,o),o+=e.Ellipsoid.packedLength,d.VertexFormat.pack(n._vertexFormat,a,o),o+=d.VertexFormat.packedLength,a[o++]=n._granularity,a[o++]=n._surfaceHeight,a[o++]=n._rotation,a[o++]=n._stRotation,a[o++]=n._extrudedHeight,a[o++]=n._shadowVolume?1:0,a[o]=t.defaultValue(n._offsetAttribute,-1),a};const B=new e.Rectangle,U=e.Ellipsoid.clone(e.Ellipsoid.UNIT_SPHERE),Y={rectangle:B,ellipsoid:U,vertexFormat:O,granularity:void 0,height:void 0,rotation:void 0,stRotation:void 0,extrudedHeight:void 0,shadowVolume:void 0,offsetAttribute:void 0};z.unpack=function(n,a,o){a=t.defaultValue(a,0);const r=e.Rectangle.unpack(n,a,B);a+=e.Rectangle.packedLength;const i=e.Ellipsoid.unpack(n,a,U);a+=e.Ellipsoid.packedLength;const s=d.VertexFormat.unpack(n,a,O);a+=d.VertexFormat.packedLength;const l=n[a++],u=n[a++],c=n[a++],m=n[a++],p=n[a++],g=1===n[a++],y=n[a];return t.defined(o)?(o._rectangle=e.Rectangle.clone(r,o._rectangle),o._ellipsoid=e.Ellipsoid.clone(i,o._ellipsoid),o._vertexFormat=d.VertexFormat.clone(s,o._vertexFormat),o._granularity=l,o._surfaceHeight=u,o._rotation=c,o._stRotation=m,o._extrudedHeight=p,o._shadowVolume=g,o._offsetAttribute=-1===y?void 0:y,o):(Y.granularity=l,Y.height=u,Y.rotation=c,Y.stRotation=m,Y.extrudedHeight=p,Y.shadowVolume=g,Y.offsetAttribute=-1===y?void 0:y,new z(Y))},z.computeRectangle=function(n,a){const o=(n=t.defaultValue(n,t.defaultValue.EMPTY_OBJECT)).rectangle,i=t.defaultValue(n.granularity,r.CesiumMath.RADIANS_PER_DEGREE),s=t.defaultValue(n.ellipsoid,e.Ellipsoid.WGS84);return H(o,i,t.defaultValue(n.rotation,0),s,a)};const q=new e.Matrix3,X=new a.Quaternion,Q=new e.Cartographic;z.createGeometry=function(o){if(r.CesiumMath.equalsEpsilon(o._rectangle.north,o._rectangle.south,r.CesiumMath.EPSILON10)||r.CesiumMath.equalsEpsilon(o._rectangle.east,o._rectangle.west,r.CesiumMath.EPSILON10))return;let s=o._rectangle;const l=o._ellipsoid,u=o._rotation,c=o._stRotation,d=o._vertexFormat,g=p.RectangleGeometryLibrary.computeOptions(s,o._granularity,u,c,R,I,k),y=q;if(0!==c||0!==u){const t=e.Rectangle.center(s,Q),n=l.geodeticSurfaceNormalCartographic(t,V);a.Quaternion.fromAxisAngle(n,-c,X),e.Matrix3.fromQuaternion(X,y)}else e.Matrix3.clone(e.Matrix3.IDENTITY,y);const f=o._surfaceHeight,h=o._extrudedHeight,b=!r.CesiumMath.equalsEpsilon(f,h,0,r.CesiumMath.EPSILON2);let _,A;if(g.lonScalar=1/o._rectangle.width,g.latScalar=1/o._rectangle.height,g.tangentRotationMatrix=y,s=o._rectangle,b){_=N(o,g);const t=a.BoundingSphere.fromRectangle3D(s,l,f,G),e=a.BoundingSphere.fromRectangle3D(s,l,h,F);A=a.BoundingSphere.union(t,e)}else{if(_=D(o,g),_.attributes.position.values=m.PolygonPipeline.scaleToGeodeticHeight(_.attributes.position.values,f,l,!1),t.defined(o._offsetAttribute)){const t=_.attributes.position.values.length,e=new Uint8Array(t/3),a=o._offsetAttribute===n.GeometryOffsetAttribute.NONE?0:1;n.arrayFill(e,a),_.attributes.applyOffset=new i.GeometryAttribute({componentDatatype:r.ComponentDatatype.UNSIGNED_BYTE,componentsPerAttribute:1,values:e})}A=a.BoundingSphere.fromRectangle3D(s,l,f)}return d.position||delete _.attributes.position,new i.Geometry({attributes:_.attributes,indices:_.indices,primitiveType:_.primitiveType,boundingSphere:A,offsetAttribute:o._offsetAttribute})},z.createShadowVolume=function(t,e,n){const a=t._granularity,o=t._ellipsoid,r=e(a,o),i=n(a,o);return new z({rectangle:t._rectangle,rotation:t._rotation,ellipsoid:o,stRotation:t._stRotation,granularity:a,extrudedHeight:i,height:r,vertexFormat:d.VertexFormat.POSITION_ONLY,shadowVolume:!0})};const W=new e.Rectangle,J=[new e.Cartesian2,new e.Cartesian2,new e.Cartesian2],j=new e.Matrix2,Z=new e.Cartographic;return Object.defineProperties(z.prototype,{rectangle:{get:function(){return t.defined(this._rotatedRectangle)||(this._rotatedRectangle=H(this._rectangle,this._granularity,this._rotation,this._ellipsoid)),this._rotatedRectangle}},textureCoordinateRotationPoints:{get:function(){return t.defined(this._textureCoordinateRotationPoints)||(this._textureCoordinateRotationPoints=function(t){if(0===t._stRotation)return[0,0,0,1,1,0];const n=e.Rectangle.clone(t._rectangle,W),a=t._granularity,o=t._ellipsoid,r=H(n,a,t._rotation-t._stRotation,o,W),i=J;i[0].x=r.west,i[0].y=r.south,i[1].x=r.west,i[1].y=r.north,i[2].x=r.east,i[2].y=r.south;const s=t.rectangle,l=e.Matrix2.fromRotation(t._stRotation,j),u=e.Rectangle.center(s,Z);for(let t=0;t<3;++t){const n=i[t];n.x-=u.longitude,n.y-=u.latitude,e.Matrix2.multiplyByVector(l,n,n),n.x+=u.longitude,n.y+=u.latitude,n.x=(n.x-s.west)/s.width,n.y=(n.y-s.south)/s.height}const c=i[0],m=i[1],p=i[2],d=new Array(6);return e.Cartesian2.pack(c,d),e.Cartesian2.pack(m,d,2),e.Cartesian2.pack(p,d,4),d}(this)),this._textureCoordinateRotationPoints}}}),function(n,a){return t.defined(a)&&(n=z.unpack(n,a)),n._ellipsoid=e.Ellipsoid.clone(n._ellipsoid),n._rectangle=e.Rectangle.clone(n._rectangle),z.createGeometry(n)}}));
+/**
+ * Cesium - https://github.com/CesiumGS/cesium
+ *
+ * Copyright 2011-2020 Cesium Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Columbus View (Pat. Pend.)
+ *
+ * Portions licensed separately.
+ * See https://github.com/CesiumGS/cesium/blob/main/LICENSE.md for full licensing details.
+ */
+
+define(['./defaultValue-81eec7ed', './Matrix2-d35cf4b5', './GeometryOffsetAttribute-2bff0974', './Transforms-f0a54c7b', './RuntimeError-8952249c', './ComponentDatatype-9e86ac8f', './GeometryAttribute-eeb38987', './GeometryAttributes-32b29525', './GeometryInstance-d60d0ef4', './GeometryPipeline-55e02a41', './IndexDatatype-bed3935d', './PolygonPipeline-a3c0d57c', './RectangleGeometryLibrary-b5624ac4', './VertexFormat-7df34ea5', './_commonjsHelpers-3aae1032-26891ab7', './combine-3c023bda', './WebGLConstants-508b9636', './AttributeCompression-d0b97a83', './EncodedCartesian3-530d5328', './IntersectionTests-a25e058d', './Plane-24f22488', './EllipsoidRhumbLine-d049f903'], (function (defaultValue, Matrix2, GeometryOffsetAttribute, Transforms, RuntimeError, ComponentDatatype, GeometryAttribute, GeometryAttributes, GeometryInstance, GeometryPipeline, IndexDatatype, PolygonPipeline, RectangleGeometryLibrary, VertexFormat, _commonjsHelpers3aae1032, combine, WebGLConstants, AttributeCompression, EncodedCartesian3, IntersectionTests, Plane, EllipsoidRhumbLine) { 'use strict';
+
+  const positionScratch = new Matrix2.Cartesian3();
+  const normalScratch = new Matrix2.Cartesian3();
+  const tangentScratch = new Matrix2.Cartesian3();
+  const bitangentScratch = new Matrix2.Cartesian3();
+  const rectangleScratch = new Matrix2.Rectangle();
+  const stScratch = new Matrix2.Cartesian2();
+  const bottomBoundingSphere = new Transforms.BoundingSphere();
+  const topBoundingSphere = new Transforms.BoundingSphere();
+
+  function createAttributes(vertexFormat, attributes) {
+    const geo = new GeometryAttribute.Geometry({
+      attributes: new GeometryAttributes.GeometryAttributes(),
+      primitiveType: GeometryAttribute.PrimitiveType.TRIANGLES,
+    });
+
+    geo.attributes.position = new GeometryAttribute.GeometryAttribute({
+      componentDatatype: ComponentDatatype.ComponentDatatype.DOUBLE,
+      componentsPerAttribute: 3,
+      values: attributes.positions,
+    });
+    if (vertexFormat.normal) {
+      geo.attributes.normal = new GeometryAttribute.GeometryAttribute({
+        componentDatatype: ComponentDatatype.ComponentDatatype.FLOAT,
+        componentsPerAttribute: 3,
+        values: attributes.normals,
+      });
+    }
+    if (vertexFormat.tangent) {
+      geo.attributes.tangent = new GeometryAttribute.GeometryAttribute({
+        componentDatatype: ComponentDatatype.ComponentDatatype.FLOAT,
+        componentsPerAttribute: 3,
+        values: attributes.tangents,
+      });
+    }
+    if (vertexFormat.bitangent) {
+      geo.attributes.bitangent = new GeometryAttribute.GeometryAttribute({
+        componentDatatype: ComponentDatatype.ComponentDatatype.FLOAT,
+        componentsPerAttribute: 3,
+        values: attributes.bitangents,
+      });
+    }
+    return geo;
+  }
+
+  function calculateAttributes(
+    positions,
+    vertexFormat,
+    ellipsoid,
+    tangentRotationMatrix
+  ) {
+    const length = positions.length;
+
+    const normals = vertexFormat.normal ? new Float32Array(length) : undefined;
+    const tangents = vertexFormat.tangent ? new Float32Array(length) : undefined;
+    const bitangents = vertexFormat.bitangent
+      ? new Float32Array(length)
+      : undefined;
+
+    let attrIndex = 0;
+    const bitangent = bitangentScratch;
+    const tangent = tangentScratch;
+    let normal = normalScratch;
+    if (vertexFormat.normal || vertexFormat.tangent || vertexFormat.bitangent) {
+      for (let i = 0; i < length; i += 3) {
+        const p = Matrix2.Cartesian3.fromArray(positions, i, positionScratch);
+        const attrIndex1 = attrIndex + 1;
+        const attrIndex2 = attrIndex + 2;
+
+        normal = ellipsoid.geodeticSurfaceNormal(p, normal);
+        if (vertexFormat.tangent || vertexFormat.bitangent) {
+          Matrix2.Cartesian3.cross(Matrix2.Cartesian3.UNIT_Z, normal, tangent);
+          Matrix2.Matrix3.multiplyByVector(tangentRotationMatrix, tangent, tangent);
+          Matrix2.Cartesian3.normalize(tangent, tangent);
+
+          if (vertexFormat.bitangent) {
+            Matrix2.Cartesian3.normalize(
+              Matrix2.Cartesian3.cross(normal, tangent, bitangent),
+              bitangent
+            );
+          }
+        }
+
+        if (vertexFormat.normal) {
+          normals[attrIndex] = normal.x;
+          normals[attrIndex1] = normal.y;
+          normals[attrIndex2] = normal.z;
+        }
+        if (vertexFormat.tangent) {
+          tangents[attrIndex] = tangent.x;
+          tangents[attrIndex1] = tangent.y;
+          tangents[attrIndex2] = tangent.z;
+        }
+        if (vertexFormat.bitangent) {
+          bitangents[attrIndex] = bitangent.x;
+          bitangents[attrIndex1] = bitangent.y;
+          bitangents[attrIndex2] = bitangent.z;
+        }
+        attrIndex += 3;
+      }
+    }
+    return createAttributes(vertexFormat, {
+      positions: positions,
+      normals: normals,
+      tangents: tangents,
+      bitangents: bitangents,
+    });
+  }
+
+  const v1Scratch = new Matrix2.Cartesian3();
+  const v2Scratch = new Matrix2.Cartesian3();
+
+  function calculateAttributesWall(positions, vertexFormat, ellipsoid) {
+    const length = positions.length;
+
+    const normals = vertexFormat.normal ? new Float32Array(length) : undefined;
+    const tangents = vertexFormat.tangent ? new Float32Array(length) : undefined;
+    const bitangents = vertexFormat.bitangent
+      ? new Float32Array(length)
+      : undefined;
+
+    let normalIndex = 0;
+    let tangentIndex = 0;
+    let bitangentIndex = 0;
+    let recomputeNormal = true;
+
+    let bitangent = bitangentScratch;
+    let tangent = tangentScratch;
+    let normal = normalScratch;
+    if (vertexFormat.normal || vertexFormat.tangent || vertexFormat.bitangent) {
+      for (let i = 0; i < length; i += 6) {
+        const p = Matrix2.Cartesian3.fromArray(positions, i, positionScratch);
+        const p1 = Matrix2.Cartesian3.fromArray(positions, (i + 6) % length, v1Scratch);
+        if (recomputeNormal) {
+          const p2 = Matrix2.Cartesian3.fromArray(positions, (i + 3) % length, v2Scratch);
+          Matrix2.Cartesian3.subtract(p1, p, p1);
+          Matrix2.Cartesian3.subtract(p2, p, p2);
+          normal = Matrix2.Cartesian3.normalize(Matrix2.Cartesian3.cross(p2, p1, normal), normal);
+          recomputeNormal = false;
+        }
+
+        if (Matrix2.Cartesian3.equalsEpsilon(p1, p, ComponentDatatype.CesiumMath.EPSILON10)) {
+          // if we've reached a corner
+          recomputeNormal = true;
+        }
+
+        if (vertexFormat.tangent || vertexFormat.bitangent) {
+          bitangent = ellipsoid.geodeticSurfaceNormal(p, bitangent);
+          if (vertexFormat.tangent) {
+            tangent = Matrix2.Cartesian3.normalize(
+              Matrix2.Cartesian3.cross(bitangent, normal, tangent),
+              tangent
+            );
+          }
+        }
+
+        if (vertexFormat.normal) {
+          normals[normalIndex++] = normal.x;
+          normals[normalIndex++] = normal.y;
+          normals[normalIndex++] = normal.z;
+          normals[normalIndex++] = normal.x;
+          normals[normalIndex++] = normal.y;
+          normals[normalIndex++] = normal.z;
+        }
+
+        if (vertexFormat.tangent) {
+          tangents[tangentIndex++] = tangent.x;
+          tangents[tangentIndex++] = tangent.y;
+          tangents[tangentIndex++] = tangent.z;
+          tangents[tangentIndex++] = tangent.x;
+          tangents[tangentIndex++] = tangent.y;
+          tangents[tangentIndex++] = tangent.z;
+        }
+
+        if (vertexFormat.bitangent) {
+          bitangents[bitangentIndex++] = bitangent.x;
+          bitangents[bitangentIndex++] = bitangent.y;
+          bitangents[bitangentIndex++] = bitangent.z;
+          bitangents[bitangentIndex++] = bitangent.x;
+          bitangents[bitangentIndex++] = bitangent.y;
+          bitangents[bitangentIndex++] = bitangent.z;
+        }
+      }
+    }
+
+    return createAttributes(vertexFormat, {
+      positions: positions,
+      normals: normals,
+      tangents: tangents,
+      bitangents: bitangents,
+    });
+  }
+
+  function constructRectangle(rectangleGeometry, computedOptions) {
+    const vertexFormat = rectangleGeometry._vertexFormat;
+    const ellipsoid = rectangleGeometry._ellipsoid;
+    const height = computedOptions.height;
+    const width = computedOptions.width;
+    const northCap = computedOptions.northCap;
+    const southCap = computedOptions.southCap;
+
+    let rowStart = 0;
+    let rowEnd = height;
+    let rowHeight = height;
+    let size = 0;
+    if (northCap) {
+      rowStart = 1;
+      rowHeight -= 1;
+      size += 1;
+    }
+    if (southCap) {
+      rowEnd -= 1;
+      rowHeight -= 1;
+      size += 1;
+    }
+    size += width * rowHeight;
+
+    const positions = vertexFormat.position
+      ? new Float64Array(size * 3)
+      : undefined;
+    const textureCoordinates = vertexFormat.st
+      ? new Float32Array(size * 2)
+      : undefined;
+
+    let posIndex = 0;
+    let stIndex = 0;
+
+    const position = positionScratch;
+    const st = stScratch;
+
+    let minX = Number.MAX_VALUE;
+    let minY = Number.MAX_VALUE;
+    let maxX = -Number.MAX_VALUE;
+    let maxY = -Number.MAX_VALUE;
+
+    for (let row = rowStart; row < rowEnd; ++row) {
+      for (let col = 0; col < width; ++col) {
+        RectangleGeometryLibrary.RectangleGeometryLibrary.computePosition(
+          computedOptions,
+          ellipsoid,
+          vertexFormat.st,
+          row,
+          col,
+          position,
+          st
+        );
+
+        positions[posIndex++] = position.x;
+        positions[posIndex++] = position.y;
+        positions[posIndex++] = position.z;
+
+        if (vertexFormat.st) {
+          textureCoordinates[stIndex++] = st.x;
+          textureCoordinates[stIndex++] = st.y;
+
+          minX = Math.min(minX, st.x);
+          minY = Math.min(minY, st.y);
+          maxX = Math.max(maxX, st.x);
+          maxY = Math.max(maxY, st.y);
+        }
+      }
+    }
+    if (northCap) {
+      RectangleGeometryLibrary.RectangleGeometryLibrary.computePosition(
+        computedOptions,
+        ellipsoid,
+        vertexFormat.st,
+        0,
+        0,
+        position,
+        st
+      );
+
+      positions[posIndex++] = position.x;
+      positions[posIndex++] = position.y;
+      positions[posIndex++] = position.z;
+
+      if (vertexFormat.st) {
+        textureCoordinates[stIndex++] = st.x;
+        textureCoordinates[stIndex++] = st.y;
+
+        minX = st.x;
+        minY = st.y;
+        maxX = st.x;
+        maxY = st.y;
+      }
+    }
+    if (southCap) {
+      RectangleGeometryLibrary.RectangleGeometryLibrary.computePosition(
+        computedOptions,
+        ellipsoid,
+        vertexFormat.st,
+        height - 1,
+        0,
+        position,
+        st
+      );
+
+      positions[posIndex++] = position.x;
+      positions[posIndex++] = position.y;
+      positions[posIndex] = position.z;
+
+      if (vertexFormat.st) {
+        textureCoordinates[stIndex++] = st.x;
+        textureCoordinates[stIndex] = st.y;
+
+        minX = Math.min(minX, st.x);
+        minY = Math.min(minY, st.y);
+        maxX = Math.max(maxX, st.x);
+        maxY = Math.max(maxY, st.y);
+      }
+    }
+
+    if (
+      vertexFormat.st &&
+      (minX < 0.0 || minY < 0.0 || maxX > 1.0 || maxY > 1.0)
+    ) {
+      for (let k = 0; k < textureCoordinates.length; k += 2) {
+        textureCoordinates[k] = (textureCoordinates[k] - minX) / (maxX - minX);
+        textureCoordinates[k + 1] =
+          (textureCoordinates[k + 1] - minY) / (maxY - minY);
+      }
+    }
+
+    const geo = calculateAttributes(
+      positions,
+      vertexFormat,
+      ellipsoid,
+      computedOptions.tangentRotationMatrix
+    );
+
+    let indicesSize = 6 * (width - 1) * (rowHeight - 1);
+    if (northCap) {
+      indicesSize += 3 * (width - 1);
+    }
+    if (southCap) {
+      indicesSize += 3 * (width - 1);
+    }
+    const indices = IndexDatatype.IndexDatatype.createTypedArray(size, indicesSize);
+    let index = 0;
+    let indicesIndex = 0;
+    let i;
+    for (i = 0; i < rowHeight - 1; ++i) {
+      for (let j = 0; j < width - 1; ++j) {
+        const upperLeft = index;
+        const lowerLeft = upperLeft + width;
+        const lowerRight = lowerLeft + 1;
+        const upperRight = upperLeft + 1;
+        indices[indicesIndex++] = upperLeft;
+        indices[indicesIndex++] = lowerLeft;
+        indices[indicesIndex++] = upperRight;
+        indices[indicesIndex++] = upperRight;
+        indices[indicesIndex++] = lowerLeft;
+        indices[indicesIndex++] = lowerRight;
+        ++index;
+      }
+      ++index;
+    }
+    if (northCap || southCap) {
+      let northIndex = size - 1;
+      const southIndex = size - 1;
+      if (northCap && southCap) {
+        northIndex = size - 2;
+      }
+
+      let p1;
+      let p2;
+      index = 0;
+
+      if (northCap) {
+        for (i = 0; i < width - 1; i++) {
+          p1 = index;
+          p2 = p1 + 1;
+          indices[indicesIndex++] = northIndex;
+          indices[indicesIndex++] = p1;
+          indices[indicesIndex++] = p2;
+          ++index;
+        }
+      }
+      if (southCap) {
+        index = (rowHeight - 1) * width;
+        for (i = 0; i < width - 1; i++) {
+          p1 = index;
+          p2 = p1 + 1;
+          indices[indicesIndex++] = p1;
+          indices[indicesIndex++] = southIndex;
+          indices[indicesIndex++] = p2;
+          ++index;
+        }
+      }
+    }
+
+    geo.indices = indices;
+    if (vertexFormat.st) {
+      geo.attributes.st = new GeometryAttribute.GeometryAttribute({
+        componentDatatype: ComponentDatatype.ComponentDatatype.FLOAT,
+        componentsPerAttribute: 2,
+        values: textureCoordinates,
+      });
+    }
+
+    return geo;
+  }
+
+  function addWallPositions(
+    wallPositions,
+    posIndex,
+    i,
+    topPositions,
+    bottomPositions
+  ) {
+    wallPositions[posIndex++] = topPositions[i];
+    wallPositions[posIndex++] = topPositions[i + 1];
+    wallPositions[posIndex++] = topPositions[i + 2];
+    wallPositions[posIndex++] = bottomPositions[i];
+    wallPositions[posIndex++] = bottomPositions[i + 1];
+    wallPositions[posIndex] = bottomPositions[i + 2];
+    return wallPositions;
+  }
+
+  function addWallTextureCoordinates(wallTextures, stIndex, i, st) {
+    wallTextures[stIndex++] = st[i];
+    wallTextures[stIndex++] = st[i + 1];
+    wallTextures[stIndex++] = st[i];
+    wallTextures[stIndex] = st[i + 1];
+    return wallTextures;
+  }
+
+  const scratchVertexFormat = new VertexFormat.VertexFormat();
+
+  function constructExtrudedRectangle(rectangleGeometry, computedOptions) {
+    const shadowVolume = rectangleGeometry._shadowVolume;
+    const offsetAttributeValue = rectangleGeometry._offsetAttribute;
+    const vertexFormat = rectangleGeometry._vertexFormat;
+    const minHeight = rectangleGeometry._extrudedHeight;
+    const maxHeight = rectangleGeometry._surfaceHeight;
+    const ellipsoid = rectangleGeometry._ellipsoid;
+
+    const height = computedOptions.height;
+    const width = computedOptions.width;
+
+    let i;
+
+    if (shadowVolume) {
+      const newVertexFormat = VertexFormat.VertexFormat.clone(
+        vertexFormat,
+        scratchVertexFormat
+      );
+      newVertexFormat.normal = true;
+      rectangleGeometry._vertexFormat = newVertexFormat;
+    }
+
+    const topBottomGeo = constructRectangle(rectangleGeometry, computedOptions);
+
+    if (shadowVolume) {
+      rectangleGeometry._vertexFormat = vertexFormat;
+    }
+
+    let topPositions = PolygonPipeline.PolygonPipeline.scaleToGeodeticHeight(
+      topBottomGeo.attributes.position.values,
+      maxHeight,
+      ellipsoid,
+      false
+    );
+    topPositions = new Float64Array(topPositions);
+    let length = topPositions.length;
+    const newLength = length * 2;
+    const positions = new Float64Array(newLength);
+    positions.set(topPositions);
+    const bottomPositions = PolygonPipeline.PolygonPipeline.scaleToGeodeticHeight(
+      topBottomGeo.attributes.position.values,
+      minHeight,
+      ellipsoid
+    );
+    positions.set(bottomPositions, length);
+    topBottomGeo.attributes.position.values = positions;
+
+    const normals = vertexFormat.normal ? new Float32Array(newLength) : undefined;
+    const tangents = vertexFormat.tangent
+      ? new Float32Array(newLength)
+      : undefined;
+    const bitangents = vertexFormat.bitangent
+      ? new Float32Array(newLength)
+      : undefined;
+    const textures = vertexFormat.st
+      ? new Float32Array((newLength / 3) * 2)
+      : undefined;
+    let topSt;
+    let topNormals;
+    if (vertexFormat.normal) {
+      topNormals = topBottomGeo.attributes.normal.values;
+      normals.set(topNormals);
+      for (i = 0; i < length; i++) {
+        topNormals[i] = -topNormals[i];
+      }
+      normals.set(topNormals, length);
+      topBottomGeo.attributes.normal.values = normals;
+    }
+    if (shadowVolume) {
+      topNormals = topBottomGeo.attributes.normal.values;
+      if (!vertexFormat.normal) {
+        topBottomGeo.attributes.normal = undefined;
+      }
+      const extrudeNormals = new Float32Array(newLength);
+      for (i = 0; i < length; i++) {
+        topNormals[i] = -topNormals[i];
+      }
+      extrudeNormals.set(topNormals, length); //only get normals for bottom layer that's going to be pushed down
+      topBottomGeo.attributes.extrudeDirection = new GeometryAttribute.GeometryAttribute({
+        componentDatatype: ComponentDatatype.ComponentDatatype.FLOAT,
+        componentsPerAttribute: 3,
+        values: extrudeNormals,
+      });
+    }
+
+    let offsetValue;
+    const hasOffsets = defaultValue.defined(offsetAttributeValue);
+    if (hasOffsets) {
+      const size = (length / 3) * 2;
+      let offsetAttribute = new Uint8Array(size);
+      if (offsetAttributeValue === GeometryOffsetAttribute.GeometryOffsetAttribute.TOP) {
+        offsetAttribute = GeometryOffsetAttribute.arrayFill(offsetAttribute, 1, 0, size / 2);
+      } else {
+        offsetValue =
+          offsetAttributeValue === GeometryOffsetAttribute.GeometryOffsetAttribute.NONE ? 0 : 1;
+        offsetAttribute = GeometryOffsetAttribute.arrayFill(offsetAttribute, offsetValue);
+      }
+
+      topBottomGeo.attributes.applyOffset = new GeometryAttribute.GeometryAttribute({
+        componentDatatype: ComponentDatatype.ComponentDatatype.UNSIGNED_BYTE,
+        componentsPerAttribute: 1,
+        values: offsetAttribute,
+      });
+    }
+
+    if (vertexFormat.tangent) {
+      const topTangents = topBottomGeo.attributes.tangent.values;
+      tangents.set(topTangents);
+      for (i = 0; i < length; i++) {
+        topTangents[i] = -topTangents[i];
+      }
+      tangents.set(topTangents, length);
+      topBottomGeo.attributes.tangent.values = tangents;
+    }
+    if (vertexFormat.bitangent) {
+      const topBitangents = topBottomGeo.attributes.bitangent.values;
+      bitangents.set(topBitangents);
+      bitangents.set(topBitangents, length);
+      topBottomGeo.attributes.bitangent.values = bitangents;
+    }
+    if (vertexFormat.st) {
+      topSt = topBottomGeo.attributes.st.values;
+      textures.set(topSt);
+      textures.set(topSt, (length / 3) * 2);
+      topBottomGeo.attributes.st.values = textures;
+    }
+
+    const indices = topBottomGeo.indices;
+    const indicesLength = indices.length;
+    const posLength = length / 3;
+    const newIndices = IndexDatatype.IndexDatatype.createTypedArray(
+      newLength / 3,
+      indicesLength * 2
+    );
+    newIndices.set(indices);
+    for (i = 0; i < indicesLength; i += 3) {
+      newIndices[i + indicesLength] = indices[i + 2] + posLength;
+      newIndices[i + 1 + indicesLength] = indices[i + 1] + posLength;
+      newIndices[i + 2 + indicesLength] = indices[i] + posLength;
+    }
+    topBottomGeo.indices = newIndices;
+
+    const northCap = computedOptions.northCap;
+    const southCap = computedOptions.southCap;
+
+    let rowHeight = height;
+    let widthMultiplier = 2;
+    let perimeterPositions = 0;
+    let corners = 4;
+    let dupliateCorners = 4;
+    if (northCap) {
+      widthMultiplier -= 1;
+      rowHeight -= 1;
+      perimeterPositions += 1;
+      corners -= 2;
+      dupliateCorners -= 1;
+    }
+    if (southCap) {
+      widthMultiplier -= 1;
+      rowHeight -= 1;
+      perimeterPositions += 1;
+      corners -= 2;
+      dupliateCorners -= 1;
+    }
+    perimeterPositions += widthMultiplier * width + 2 * rowHeight - corners;
+
+    const wallCount = (perimeterPositions + dupliateCorners) * 2;
+
+    let wallPositions = new Float64Array(wallCount * 3);
+    const wallExtrudeNormals = shadowVolume
+      ? new Float32Array(wallCount * 3)
+      : undefined;
+    let wallOffsetAttribute = hasOffsets ? new Uint8Array(wallCount) : undefined;
+    let wallTextures = vertexFormat.st
+      ? new Float32Array(wallCount * 2)
+      : undefined;
+
+    const computeTopOffsets =
+      offsetAttributeValue === GeometryOffsetAttribute.GeometryOffsetAttribute.TOP;
+    if (hasOffsets && !computeTopOffsets) {
+      offsetValue = offsetAttributeValue === GeometryOffsetAttribute.GeometryOffsetAttribute.ALL ? 1 : 0;
+      wallOffsetAttribute = GeometryOffsetAttribute.arrayFill(wallOffsetAttribute, offsetValue);
+    }
+
+    let posIndex = 0;
+    let stIndex = 0;
+    let extrudeNormalIndex = 0;
+    let wallOffsetIndex = 0;
+    const area = width * rowHeight;
+    let threeI;
+    for (i = 0; i < area; i += width) {
+      threeI = i * 3;
+      wallPositions = addWallPositions(
+        wallPositions,
+        posIndex,
+        threeI,
+        topPositions,
+        bottomPositions
+      );
+      posIndex += 6;
+      if (vertexFormat.st) {
+        wallTextures = addWallTextureCoordinates(
+          wallTextures,
+          stIndex,
+          i * 2,
+          topSt
+        );
+        stIndex += 4;
+      }
+      if (shadowVolume) {
+        extrudeNormalIndex += 3;
+        wallExtrudeNormals[extrudeNormalIndex++] = topNormals[threeI];
+        wallExtrudeNormals[extrudeNormalIndex++] = topNormals[threeI + 1];
+        wallExtrudeNormals[extrudeNormalIndex++] = topNormals[threeI + 2];
+      }
+      if (computeTopOffsets) {
+        wallOffsetAttribute[wallOffsetIndex++] = 1;
+        wallOffsetIndex += 1;
+      }
+    }
+
+    if (!southCap) {
+      for (i = area - width; i < area; i++) {
+        threeI = i * 3;
+        wallPositions = addWallPositions(
+          wallPositions,
+          posIndex,
+          threeI,
+          topPositions,
+          bottomPositions
+        );
+        posIndex += 6;
+        if (vertexFormat.st) {
+          wallTextures = addWallTextureCoordinates(
+            wallTextures,
+            stIndex,
+            i * 2,
+            topSt
+          );
+          stIndex += 4;
+        }
+        if (shadowVolume) {
+          extrudeNormalIndex += 3;
+          wallExtrudeNormals[extrudeNormalIndex++] = topNormals[threeI];
+          wallExtrudeNormals[extrudeNormalIndex++] = topNormals[threeI + 1];
+          wallExtrudeNormals[extrudeNormalIndex++] = topNormals[threeI + 2];
+        }
+        if (computeTopOffsets) {
+          wallOffsetAttribute[wallOffsetIndex++] = 1;
+          wallOffsetIndex += 1;
+        }
+      }
+    } else {
+      const southIndex = northCap ? area + 1 : area;
+      threeI = southIndex * 3;
+
+      for (i = 0; i < 2; i++) {
+        // duplicate corner points
+        wallPositions = addWallPositions(
+          wallPositions,
+          posIndex,
+          threeI,
+          topPositions,
+          bottomPositions
+        );
+        posIndex += 6;
+        if (vertexFormat.st) {
+          wallTextures = addWallTextureCoordinates(
+            wallTextures,
+            stIndex,
+            southIndex * 2,
+            topSt
+          );
+          stIndex += 4;
+        }
+        if (shadowVolume) {
+          extrudeNormalIndex += 3;
+          wallExtrudeNormals[extrudeNormalIndex++] = topNormals[threeI];
+          wallExtrudeNormals[extrudeNormalIndex++] = topNormals[threeI + 1];
+          wallExtrudeNormals[extrudeNormalIndex++] = topNormals[threeI + 2];
+        }
+        if (computeTopOffsets) {
+          wallOffsetAttribute[wallOffsetIndex++] = 1;
+          wallOffsetIndex += 1;
+        }
+      }
+    }
+
+    for (i = area - 1; i > 0; i -= width) {
+      threeI = i * 3;
+      wallPositions = addWallPositions(
+        wallPositions,
+        posIndex,
+        threeI,
+        topPositions,
+        bottomPositions
+      );
+      posIndex += 6;
+      if (vertexFormat.st) {
+        wallTextures = addWallTextureCoordinates(
+          wallTextures,
+          stIndex,
+          i * 2,
+          topSt
+        );
+        stIndex += 4;
+      }
+      if (shadowVolume) {
+        extrudeNormalIndex += 3;
+        wallExtrudeNormals[extrudeNormalIndex++] = topNormals[threeI];
+        wallExtrudeNormals[extrudeNormalIndex++] = topNormals[threeI + 1];
+        wallExtrudeNormals[extrudeNormalIndex++] = topNormals[threeI + 2];
+      }
+      if (computeTopOffsets) {
+        wallOffsetAttribute[wallOffsetIndex++] = 1;
+        wallOffsetIndex += 1;
+      }
+    }
+
+    if (!northCap) {
+      for (i = width - 1; i >= 0; i--) {
+        threeI = i * 3;
+        wallPositions = addWallPositions(
+          wallPositions,
+          posIndex,
+          threeI,
+          topPositions,
+          bottomPositions
+        );
+        posIndex += 6;
+        if (vertexFormat.st) {
+          wallTextures = addWallTextureCoordinates(
+            wallTextures,
+            stIndex,
+            i * 2,
+            topSt
+          );
+          stIndex += 4;
+        }
+        if (shadowVolume) {
+          extrudeNormalIndex += 3;
+          wallExtrudeNormals[extrudeNormalIndex++] = topNormals[threeI];
+          wallExtrudeNormals[extrudeNormalIndex++] = topNormals[threeI + 1];
+          wallExtrudeNormals[extrudeNormalIndex++] = topNormals[threeI + 2];
+        }
+        if (computeTopOffsets) {
+          wallOffsetAttribute[wallOffsetIndex++] = 1;
+          wallOffsetIndex += 1;
+        }
+      }
+    } else {
+      const northIndex = area;
+      threeI = northIndex * 3;
+
+      for (i = 0; i < 2; i++) {
+        // duplicate corner points
+        wallPositions = addWallPositions(
+          wallPositions,
+          posIndex,
+          threeI,
+          topPositions,
+          bottomPositions
+        );
+        posIndex += 6;
+        if (vertexFormat.st) {
+          wallTextures = addWallTextureCoordinates(
+            wallTextures,
+            stIndex,
+            northIndex * 2,
+            topSt
+          );
+          stIndex += 4;
+        }
+        if (shadowVolume) {
+          extrudeNormalIndex += 3;
+          wallExtrudeNormals[extrudeNormalIndex++] = topNormals[threeI];
+          wallExtrudeNormals[extrudeNormalIndex++] = topNormals[threeI + 1];
+          wallExtrudeNormals[extrudeNormalIndex++] = topNormals[threeI + 2];
+        }
+        if (computeTopOffsets) {
+          wallOffsetAttribute[wallOffsetIndex++] = 1;
+          wallOffsetIndex += 1;
+        }
+      }
+    }
+
+    let geo = calculateAttributesWall(wallPositions, vertexFormat, ellipsoid);
+
+    if (vertexFormat.st) {
+      geo.attributes.st = new GeometryAttribute.GeometryAttribute({
+        componentDatatype: ComponentDatatype.ComponentDatatype.FLOAT,
+        componentsPerAttribute: 2,
+        values: wallTextures,
+      });
+    }
+    if (shadowVolume) {
+      geo.attributes.extrudeDirection = new GeometryAttribute.GeometryAttribute({
+        componentDatatype: ComponentDatatype.ComponentDatatype.FLOAT,
+        componentsPerAttribute: 3,
+        values: wallExtrudeNormals,
+      });
+    }
+    if (hasOffsets) {
+      geo.attributes.applyOffset = new GeometryAttribute.GeometryAttribute({
+        componentDatatype: ComponentDatatype.ComponentDatatype.UNSIGNED_BYTE,
+        componentsPerAttribute: 1,
+        values: wallOffsetAttribute,
+      });
+    }
+
+    const wallIndices = IndexDatatype.IndexDatatype.createTypedArray(
+      wallCount,
+      perimeterPositions * 6
+    );
+
+    let upperLeft;
+    let lowerLeft;
+    let lowerRight;
+    let upperRight;
+    length = wallPositions.length / 3;
+    let index = 0;
+    for (i = 0; i < length - 1; i += 2) {
+      upperLeft = i;
+      upperRight = (upperLeft + 2) % length;
+      const p1 = Matrix2.Cartesian3.fromArray(wallPositions, upperLeft * 3, v1Scratch);
+      const p2 = Matrix2.Cartesian3.fromArray(wallPositions, upperRight * 3, v2Scratch);
+      if (Matrix2.Cartesian3.equalsEpsilon(p1, p2, ComponentDatatype.CesiumMath.EPSILON10)) {
+        continue;
+      }
+      lowerLeft = (upperLeft + 1) % length;
+      lowerRight = (lowerLeft + 2) % length;
+      wallIndices[index++] = upperLeft;
+      wallIndices[index++] = lowerLeft;
+      wallIndices[index++] = upperRight;
+      wallIndices[index++] = upperRight;
+      wallIndices[index++] = lowerLeft;
+      wallIndices[index++] = lowerRight;
+    }
+
+    geo.indices = wallIndices;
+
+    geo = GeometryPipeline.GeometryPipeline.combineInstances([
+      new GeometryInstance.GeometryInstance({
+        geometry: topBottomGeo,
+      }),
+      new GeometryInstance.GeometryInstance({
+        geometry: geo,
+      }),
+    ]);
+
+    return geo[0];
+  }
+
+  const scratchRectanglePoints = [
+    new Matrix2.Cartesian3(),
+    new Matrix2.Cartesian3(),
+    new Matrix2.Cartesian3(),
+    new Matrix2.Cartesian3(),
+  ];
+  const nwScratch = new Matrix2.Cartographic();
+  const stNwScratch = new Matrix2.Cartographic();
+  function computeRectangle(rectangle, granularity, rotation, ellipsoid, result) {
+    if (rotation === 0.0) {
+      return Matrix2.Rectangle.clone(rectangle, result);
+    }
+
+    const computedOptions = RectangleGeometryLibrary.RectangleGeometryLibrary.computeOptions(
+      rectangle,
+      granularity,
+      rotation,
+      0,
+      rectangleScratch,
+      nwScratch
+    );
+
+    const height = computedOptions.height;
+    const width = computedOptions.width;
+
+    const positions = scratchRectanglePoints;
+    RectangleGeometryLibrary.RectangleGeometryLibrary.computePosition(
+      computedOptions,
+      ellipsoid,
+      false,
+      0,
+      0,
+      positions[0]
+    );
+    RectangleGeometryLibrary.RectangleGeometryLibrary.computePosition(
+      computedOptions,
+      ellipsoid,
+      false,
+      0,
+      width - 1,
+      positions[1]
+    );
+    RectangleGeometryLibrary.RectangleGeometryLibrary.computePosition(
+      computedOptions,
+      ellipsoid,
+      false,
+      height - 1,
+      0,
+      positions[2]
+    );
+    RectangleGeometryLibrary.RectangleGeometryLibrary.computePosition(
+      computedOptions,
+      ellipsoid,
+      false,
+      height - 1,
+      width - 1,
+      positions[3]
+    );
+
+    return Matrix2.Rectangle.fromCartesianArray(positions, ellipsoid, result);
+  }
+
+  /**
+   * A description of a cartographic rectangle on an ellipsoid centered at the origin. Rectangle geometry can be rendered with both {@link Primitive} and {@link GroundPrimitive}.
+   *
+   * @alias RectangleGeometry
+   * @constructor
+   *
+   * @param {Object} options Object with the following properties:
+   * @param {Rectangle} options.rectangle A cartographic rectangle with north, south, east and west properties in radians.
+   * @param {VertexFormat} [options.vertexFormat=VertexFormat.DEFAULT] The vertex attributes to be computed.
+   * @param {Ellipsoid} [options.ellipsoid=Ellipsoid.WGS84] The ellipsoid on which the rectangle lies.
+   * @param {Number} [options.granularity=CesiumMath.RADIANS_PER_DEGREE] The distance, in radians, between each latitude and longitude. Determines the number of positions in the buffer.
+   * @param {Number} [options.height=0.0] The distance in meters between the rectangle and the ellipsoid surface.
+   * @param {Number} [options.rotation=0.0] The rotation of the rectangle, in radians. A positive rotation is counter-clockwise.
+   * @param {Number} [options.stRotation=0.0] The rotation of the texture coordinates, in radians. A positive rotation is counter-clockwise.
+   * @param {Number} [options.extrudedHeight] The distance in meters between the rectangle's extruded face and the ellipsoid surface.
+   *
+   * @exception {DeveloperError} <code>options.rectangle.north</code> must be in the interval [<code>-Pi/2</code>, <code>Pi/2</code>].
+   * @exception {DeveloperError} <code>options.rectangle.south</code> must be in the interval [<code>-Pi/2</code>, <code>Pi/2</code>].
+   * @exception {DeveloperError} <code>options.rectangle.east</code> must be in the interval [<code>-Pi</code>, <code>Pi</code>].
+   * @exception {DeveloperError} <code>options.rectangle.west</code> must be in the interval [<code>-Pi</code>, <code>Pi</code>].
+   * @exception {DeveloperError} <code>options.rectangle.north</code> must be greater than <code>options.rectangle.south</code>.
+   *
+   * @see RectangleGeometry#createGeometry
+   *
+   * @demo {@link https://sandcastle.cesium.com/index.html?src=Rectangle.html|Cesium Sandcastle Rectangle Demo}
+   *
+   * @example
+   * // 1. create a rectangle
+   * const rectangle = new Cesium.RectangleGeometry({
+   *   ellipsoid : Cesium.Ellipsoid.WGS84,
+   *   rectangle : Cesium.Rectangle.fromDegrees(-80.0, 39.0, -74.0, 42.0),
+   *   height : 10000.0
+   * });
+   * const geometry = Cesium.RectangleGeometry.createGeometry(rectangle);
+   *
+   * // 2. create an extruded rectangle without a top
+   * const rectangle = new Cesium.RectangleGeometry({
+   *   ellipsoid : Cesium.Ellipsoid.WGS84,
+   *   rectangle : Cesium.Rectangle.fromDegrees(-80.0, 39.0, -74.0, 42.0),
+   *   height : 10000.0,
+   *   extrudedHeight: 300000
+   * });
+   * const geometry = Cesium.RectangleGeometry.createGeometry(rectangle);
+   */
+  function RectangleGeometry(options) {
+    options = defaultValue.defaultValue(options, defaultValue.defaultValue.EMPTY_OBJECT);
+
+    const rectangle = options.rectangle;
+
+    //>>includeStart('debug', pragmas.debug);
+    RuntimeError.Check.typeOf.object("rectangle", rectangle);
+    Matrix2.Rectangle.validate(rectangle);
+    if (rectangle.north < rectangle.south) {
+      throw new RuntimeError.DeveloperError(
+        "options.rectangle.north must be greater than or equal to options.rectangle.south"
+      );
+    }
+    //>>includeEnd('debug');
+
+    const height = defaultValue.defaultValue(options.height, 0.0);
+    const extrudedHeight = defaultValue.defaultValue(options.extrudedHeight, height);
+
+    this._rectangle = Matrix2.Rectangle.clone(rectangle);
+    this._granularity = defaultValue.defaultValue(
+      options.granularity,
+      ComponentDatatype.CesiumMath.RADIANS_PER_DEGREE
+    );
+    this._ellipsoid = Matrix2.Ellipsoid.clone(
+      defaultValue.defaultValue(options.ellipsoid, Matrix2.Ellipsoid.WGS84)
+    );
+    this._surfaceHeight = Math.max(height, extrudedHeight);
+    this._rotation = defaultValue.defaultValue(options.rotation, 0.0);
+    this._stRotation = defaultValue.defaultValue(options.stRotation, 0.0);
+    this._vertexFormat = VertexFormat.VertexFormat.clone(
+      defaultValue.defaultValue(options.vertexFormat, VertexFormat.VertexFormat.DEFAULT)
+    );
+    this._extrudedHeight = Math.min(height, extrudedHeight);
+    this._shadowVolume = defaultValue.defaultValue(options.shadowVolume, false);
+    this._workerName = "createRectangleGeometry";
+    this._offsetAttribute = options.offsetAttribute;
+    this._rotatedRectangle = undefined;
+
+    this._textureCoordinateRotationPoints = undefined;
+  }
+
+  /**
+   * The number of elements used to pack the object into an array.
+   * @type {Number}
+   */
+  RectangleGeometry.packedLength =
+    Matrix2.Rectangle.packedLength +
+    Matrix2.Ellipsoid.packedLength +
+    VertexFormat.VertexFormat.packedLength +
+    7;
+
+  /**
+   * Stores the provided instance into the provided array.
+   *
+   * @param {RectangleGeometry} value The value to pack.
+   * @param {Number[]} array The array to pack into.
+   * @param {Number} [startingIndex=0] The index into the array at which to start packing the elements.
+   *
+   * @returns {Number[]} The array that was packed into
+   */
+  RectangleGeometry.pack = function (value, array, startingIndex) {
+    //>>includeStart('debug', pragmas.debug);
+    RuntimeError.Check.typeOf.object("value", value);
+    RuntimeError.Check.defined("array", array);
+    //>>includeEnd('debug');
+
+    startingIndex = defaultValue.defaultValue(startingIndex, 0);
+
+    Matrix2.Rectangle.pack(value._rectangle, array, startingIndex);
+    startingIndex += Matrix2.Rectangle.packedLength;
+
+    Matrix2.Ellipsoid.pack(value._ellipsoid, array, startingIndex);
+    startingIndex += Matrix2.Ellipsoid.packedLength;
+
+    VertexFormat.VertexFormat.pack(value._vertexFormat, array, startingIndex);
+    startingIndex += VertexFormat.VertexFormat.packedLength;
+
+    array[startingIndex++] = value._granularity;
+    array[startingIndex++] = value._surfaceHeight;
+    array[startingIndex++] = value._rotation;
+    array[startingIndex++] = value._stRotation;
+    array[startingIndex++] = value._extrudedHeight;
+    array[startingIndex++] = value._shadowVolume ? 1.0 : 0.0;
+    array[startingIndex] = defaultValue.defaultValue(value._offsetAttribute, -1);
+
+    return array;
+  };
+
+  const scratchRectangle = new Matrix2.Rectangle();
+  const scratchEllipsoid = Matrix2.Ellipsoid.clone(Matrix2.Ellipsoid.UNIT_SPHERE);
+  const scratchOptions = {
+    rectangle: scratchRectangle,
+    ellipsoid: scratchEllipsoid,
+    vertexFormat: scratchVertexFormat,
+    granularity: undefined,
+    height: undefined,
+    rotation: undefined,
+    stRotation: undefined,
+    extrudedHeight: undefined,
+    shadowVolume: undefined,
+    offsetAttribute: undefined,
+  };
+
+  /**
+   * Retrieves an instance from a packed array.
+   *
+   * @param {Number[]} array The packed array.
+   * @param {Number} [startingIndex=0] The starting index of the element to be unpacked.
+   * @param {RectangleGeometry} [result] The object into which to store the result.
+   * @returns {RectangleGeometry} The modified result parameter or a new RectangleGeometry instance if one was not provided.
+   */
+  RectangleGeometry.unpack = function (array, startingIndex, result) {
+    //>>includeStart('debug', pragmas.debug);
+    RuntimeError.Check.defined("array", array);
+    //>>includeEnd('debug');
+
+    startingIndex = defaultValue.defaultValue(startingIndex, 0);
+
+    const rectangle = Matrix2.Rectangle.unpack(array, startingIndex, scratchRectangle);
+    startingIndex += Matrix2.Rectangle.packedLength;
+
+    const ellipsoid = Matrix2.Ellipsoid.unpack(array, startingIndex, scratchEllipsoid);
+    startingIndex += Matrix2.Ellipsoid.packedLength;
+
+    const vertexFormat = VertexFormat.VertexFormat.unpack(
+      array,
+      startingIndex,
+      scratchVertexFormat
+    );
+    startingIndex += VertexFormat.VertexFormat.packedLength;
+
+    const granularity = array[startingIndex++];
+    const surfaceHeight = array[startingIndex++];
+    const rotation = array[startingIndex++];
+    const stRotation = array[startingIndex++];
+    const extrudedHeight = array[startingIndex++];
+    const shadowVolume = array[startingIndex++] === 1.0;
+    const offsetAttribute = array[startingIndex];
+
+    if (!defaultValue.defined(result)) {
+      scratchOptions.granularity = granularity;
+      scratchOptions.height = surfaceHeight;
+      scratchOptions.rotation = rotation;
+      scratchOptions.stRotation = stRotation;
+      scratchOptions.extrudedHeight = extrudedHeight;
+      scratchOptions.shadowVolume = shadowVolume;
+      scratchOptions.offsetAttribute =
+        offsetAttribute === -1 ? undefined : offsetAttribute;
+
+      return new RectangleGeometry(scratchOptions);
+    }
+
+    result._rectangle = Matrix2.Rectangle.clone(rectangle, result._rectangle);
+    result._ellipsoid = Matrix2.Ellipsoid.clone(ellipsoid, result._ellipsoid);
+    result._vertexFormat = VertexFormat.VertexFormat.clone(vertexFormat, result._vertexFormat);
+    result._granularity = granularity;
+    result._surfaceHeight = surfaceHeight;
+    result._rotation = rotation;
+    result._stRotation = stRotation;
+    result._extrudedHeight = extrudedHeight;
+    result._shadowVolume = shadowVolume;
+    result._offsetAttribute =
+      offsetAttribute === -1 ? undefined : offsetAttribute;
+
+    return result;
+  };
+
+  /**
+   * Computes the bounding rectangle based on the provided options
+   *
+   * @param {Object} options Object with the following properties:
+   * @param {Rectangle} options.rectangle A cartographic rectangle with north, south, east and west properties in radians.
+   * @param {Ellipsoid} [options.ellipsoid=Ellipsoid.WGS84] The ellipsoid on which the rectangle lies.
+   * @param {Number} [options.granularity=CesiumMath.RADIANS_PER_DEGREE] The distance, in radians, between each latitude and longitude. Determines the number of positions in the buffer.
+   * @param {Number} [options.rotation=0.0] The rotation of the rectangle, in radians. A positive rotation is counter-clockwise.
+   * @param {Rectangle} [result] An object in which to store the result.
+   *
+   * @returns {Rectangle} The result rectangle
+   */
+  RectangleGeometry.computeRectangle = function (options, result) {
+    options = defaultValue.defaultValue(options, defaultValue.defaultValue.EMPTY_OBJECT);
+
+    const rectangle = options.rectangle;
+
+    //>>includeStart('debug', pragmas.debug);
+    RuntimeError.Check.typeOf.object("rectangle", rectangle);
+    Matrix2.Rectangle.validate(rectangle);
+    if (rectangle.north < rectangle.south) {
+      throw new RuntimeError.DeveloperError(
+        "options.rectangle.north must be greater than or equal to options.rectangle.south"
+      );
+    }
+    //>>includeEnd('debug');
+
+    const granularity = defaultValue.defaultValue(
+      options.granularity,
+      ComponentDatatype.CesiumMath.RADIANS_PER_DEGREE
+    );
+    const ellipsoid = defaultValue.defaultValue(options.ellipsoid, Matrix2.Ellipsoid.WGS84);
+    const rotation = defaultValue.defaultValue(options.rotation, 0.0);
+
+    return computeRectangle(rectangle, granularity, rotation, ellipsoid, result);
+  };
+
+  const tangentRotationMatrixScratch = new Matrix2.Matrix3();
+  const quaternionScratch = new Transforms.Quaternion();
+  const centerScratch = new Matrix2.Cartographic();
+  /**
+   * Computes the geometric representation of a rectangle, including its vertices, indices, and a bounding sphere.
+   *
+   * @param {RectangleGeometry} rectangleGeometry A description of the rectangle.
+   * @returns {Geometry|undefined} The computed vertices and indices.
+   *
+   * @exception {DeveloperError} Rotated rectangle is invalid.
+   */
+  RectangleGeometry.createGeometry = function (rectangleGeometry) {
+    if (
+      ComponentDatatype.CesiumMath.equalsEpsilon(
+        rectangleGeometry._rectangle.north,
+        rectangleGeometry._rectangle.south,
+        ComponentDatatype.CesiumMath.EPSILON10
+      ) ||
+      ComponentDatatype.CesiumMath.equalsEpsilon(
+        rectangleGeometry._rectangle.east,
+        rectangleGeometry._rectangle.west,
+        ComponentDatatype.CesiumMath.EPSILON10
+      )
+    ) {
+      return undefined;
+    }
+
+    let rectangle = rectangleGeometry._rectangle;
+    const ellipsoid = rectangleGeometry._ellipsoid;
+    const rotation = rectangleGeometry._rotation;
+    const stRotation = rectangleGeometry._stRotation;
+    const vertexFormat = rectangleGeometry._vertexFormat;
+
+    const computedOptions = RectangleGeometryLibrary.RectangleGeometryLibrary.computeOptions(
+      rectangle,
+      rectangleGeometry._granularity,
+      rotation,
+      stRotation,
+      rectangleScratch,
+      nwScratch,
+      stNwScratch
+    );
+
+    const tangentRotationMatrix = tangentRotationMatrixScratch;
+    if (stRotation !== 0 || rotation !== 0) {
+      const center = Matrix2.Rectangle.center(rectangle, centerScratch);
+      const axis = ellipsoid.geodeticSurfaceNormalCartographic(center, v1Scratch);
+      Transforms.Quaternion.fromAxisAngle(axis, -stRotation, quaternionScratch);
+      Matrix2.Matrix3.fromQuaternion(quaternionScratch, tangentRotationMatrix);
+    } else {
+      Matrix2.Matrix3.clone(Matrix2.Matrix3.IDENTITY, tangentRotationMatrix);
+    }
+
+    const surfaceHeight = rectangleGeometry._surfaceHeight;
+    const extrudedHeight = rectangleGeometry._extrudedHeight;
+    const extrude = !ComponentDatatype.CesiumMath.equalsEpsilon(
+      surfaceHeight,
+      extrudedHeight,
+      0,
+      ComponentDatatype.CesiumMath.EPSILON2
+    );
+
+    computedOptions.lonScalar = 1.0 / rectangleGeometry._rectangle.width;
+    computedOptions.latScalar = 1.0 / rectangleGeometry._rectangle.height;
+    computedOptions.tangentRotationMatrix = tangentRotationMatrix;
+
+    let geometry;
+    let boundingSphere;
+    rectangle = rectangleGeometry._rectangle;
+    if (extrude) {
+      geometry = constructExtrudedRectangle(rectangleGeometry, computedOptions);
+      const topBS = Transforms.BoundingSphere.fromRectangle3D(
+        rectangle,
+        ellipsoid,
+        surfaceHeight,
+        topBoundingSphere
+      );
+      const bottomBS = Transforms.BoundingSphere.fromRectangle3D(
+        rectangle,
+        ellipsoid,
+        extrudedHeight,
+        bottomBoundingSphere
+      );
+      boundingSphere = Transforms.BoundingSphere.union(topBS, bottomBS);
+    } else {
+      geometry = constructRectangle(rectangleGeometry, computedOptions);
+      geometry.attributes.position.values = PolygonPipeline.PolygonPipeline.scaleToGeodeticHeight(
+        geometry.attributes.position.values,
+        surfaceHeight,
+        ellipsoid,
+        false
+      );
+
+      if (defaultValue.defined(rectangleGeometry._offsetAttribute)) {
+        const length = geometry.attributes.position.values.length;
+        const applyOffset = new Uint8Array(length / 3);
+        const offsetValue =
+          rectangleGeometry._offsetAttribute === GeometryOffsetAttribute.GeometryOffsetAttribute.NONE
+            ? 0
+            : 1;
+        GeometryOffsetAttribute.arrayFill(applyOffset, offsetValue);
+        geometry.attributes.applyOffset = new GeometryAttribute.GeometryAttribute({
+          componentDatatype: ComponentDatatype.ComponentDatatype.UNSIGNED_BYTE,
+          componentsPerAttribute: 1,
+          values: applyOffset,
+        });
+      }
+
+      boundingSphere = Transforms.BoundingSphere.fromRectangle3D(
+        rectangle,
+        ellipsoid,
+        surfaceHeight
+      );
+    }
+
+    if (!vertexFormat.position) {
+      delete geometry.attributes.position;
+    }
+
+    return new GeometryAttribute.Geometry({
+      attributes: geometry.attributes,
+      indices: geometry.indices,
+      primitiveType: geometry.primitiveType,
+      boundingSphere: boundingSphere,
+      offsetAttribute: rectangleGeometry._offsetAttribute,
+    });
+  };
+
+  /**
+   * @private
+   */
+  RectangleGeometry.createShadowVolume = function (
+    rectangleGeometry,
+    minHeightFunc,
+    maxHeightFunc
+  ) {
+    const granularity = rectangleGeometry._granularity;
+    const ellipsoid = rectangleGeometry._ellipsoid;
+
+    const minHeight = minHeightFunc(granularity, ellipsoid);
+    const maxHeight = maxHeightFunc(granularity, ellipsoid);
+
+    return new RectangleGeometry({
+      rectangle: rectangleGeometry._rectangle,
+      rotation: rectangleGeometry._rotation,
+      ellipsoid: ellipsoid,
+      stRotation: rectangleGeometry._stRotation,
+      granularity: granularity,
+      extrudedHeight: maxHeight,
+      height: minHeight,
+      vertexFormat: VertexFormat.VertexFormat.POSITION_ONLY,
+      shadowVolume: true,
+    });
+  };
+
+  const unrotatedTextureRectangleScratch = new Matrix2.Rectangle();
+  const points2DScratch = [new Matrix2.Cartesian2(), new Matrix2.Cartesian2(), new Matrix2.Cartesian2()];
+  const rotation2DScratch = new Matrix2.Matrix2();
+  const rectangleCenterScratch = new Matrix2.Cartographic();
+
+  function textureCoordinateRotationPoints(rectangleGeometry) {
+    if (rectangleGeometry._stRotation === 0.0) {
+      return [0, 0, 0, 1, 1, 0];
+    }
+
+    const rectangle = Matrix2.Rectangle.clone(
+      rectangleGeometry._rectangle,
+      unrotatedTextureRectangleScratch
+    );
+    const granularity = rectangleGeometry._granularity;
+    const ellipsoid = rectangleGeometry._ellipsoid;
+
+    // Rotate to align the texture coordinates with ENU
+    const rotation = rectangleGeometry._rotation - rectangleGeometry._stRotation;
+
+    const unrotatedTextureRectangle = computeRectangle(
+      rectangle,
+      granularity,
+      rotation,
+      ellipsoid,
+      unrotatedTextureRectangleScratch
+    );
+
+    // Assume a computed "east-north" texture coordinate system based on spherical or planar tricks, bounded by `boundingRectangle`.
+    // The "desired" texture coordinate system forms an oriented rectangle (un-oriented computed) around the geometry that completely and tightly bounds it.
+    // We want to map from the "east-north" texture coordinate system into the "desired" system using a pair of lines (analagous planes in 2D)
+    // Compute 3 corners of the "desired" texture coordinate system in "east-north" texture space by the following in cartographic space:
+    // - rotate 3 of the corners in unrotatedTextureRectangle by stRotation around the center of the bounding rectangle
+    // - apply the "east-north" system's normalization formula to the rotated cartographics, even though this is likely to produce values outside [0-1].
+    // This gives us a set of points in the "east-north" texture coordinate system that can be used to map "east-north" texture coordinates to "desired."
+
+    const points2D = points2DScratch;
+    points2D[0].x = unrotatedTextureRectangle.west;
+    points2D[0].y = unrotatedTextureRectangle.south;
+
+    points2D[1].x = unrotatedTextureRectangle.west;
+    points2D[1].y = unrotatedTextureRectangle.north;
+
+    points2D[2].x = unrotatedTextureRectangle.east;
+    points2D[2].y = unrotatedTextureRectangle.south;
+
+    const boundingRectangle = rectangleGeometry.rectangle;
+    const toDesiredInComputed = Matrix2.Matrix2.fromRotation(
+      rectangleGeometry._stRotation,
+      rotation2DScratch
+    );
+    const boundingRectangleCenter = Matrix2.Rectangle.center(
+      boundingRectangle,
+      rectangleCenterScratch
+    );
+
+    for (let i = 0; i < 3; ++i) {
+      const point2D = points2D[i];
+      point2D.x -= boundingRectangleCenter.longitude;
+      point2D.y -= boundingRectangleCenter.latitude;
+      Matrix2.Matrix2.multiplyByVector(toDesiredInComputed, point2D, point2D);
+      point2D.x += boundingRectangleCenter.longitude;
+      point2D.y += boundingRectangleCenter.latitude;
+
+      // Convert point into east-north texture coordinate space
+      point2D.x = (point2D.x - boundingRectangle.west) / boundingRectangle.width;
+      point2D.y =
+        (point2D.y - boundingRectangle.south) / boundingRectangle.height;
+    }
+
+    const minXYCorner = points2D[0];
+    const maxYCorner = points2D[1];
+    const maxXCorner = points2D[2];
+    const result = new Array(6);
+    Matrix2.Cartesian2.pack(minXYCorner, result);
+    Matrix2.Cartesian2.pack(maxYCorner, result, 2);
+    Matrix2.Cartesian2.pack(maxXCorner, result, 4);
+    return result;
+  }
+
+  Object.defineProperties(RectangleGeometry.prototype, {
+    /**
+     * @private
+     */
+    rectangle: {
+      get: function () {
+        if (!defaultValue.defined(this._rotatedRectangle)) {
+          this._rotatedRectangle = computeRectangle(
+            this._rectangle,
+            this._granularity,
+            this._rotation,
+            this._ellipsoid
+          );
+        }
+        return this._rotatedRectangle;
+      },
+    },
+    /**
+     * For remapping texture coordinates when rendering RectangleGeometries as GroundPrimitives.
+     * This version permits skew in textures by computing offsets directly in cartographic space and
+     * more accurately approximates rendering RectangleGeometries with height as standard Primitives.
+     * @see Geometry#_textureCoordinateRotationPoints
+     * @private
+     */
+    textureCoordinateRotationPoints: {
+      get: function () {
+        if (!defaultValue.defined(this._textureCoordinateRotationPoints)) {
+          this._textureCoordinateRotationPoints = textureCoordinateRotationPoints(
+            this
+          );
+        }
+        return this._textureCoordinateRotationPoints;
+      },
+    },
+  });
+
+  function createRectangleGeometry(rectangleGeometry, offset) {
+    if (defaultValue.defined(offset)) {
+      rectangleGeometry = RectangleGeometry.unpack(rectangleGeometry, offset);
+    }
+    rectangleGeometry._ellipsoid = Matrix2.Ellipsoid.clone(rectangleGeometry._ellipsoid);
+    rectangleGeometry._rectangle = Matrix2.Rectangle.clone(rectangleGeometry._rectangle);
+    return RectangleGeometry.createGeometry(rectangleGeometry);
+  }
+
+  return createRectangleGeometry;
+
+}));
+//# sourceMappingURL=createRectangleGeometry.js.map

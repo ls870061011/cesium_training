@@ -48,15 +48,16 @@
     // });
 
     var provider = new Cesium.WebMapServiceImageryProvider({
-      url:
-        "https://nationalmap.gov.au/proxy/http://geoserver.nationalmap.nicta.com.au/geotopo_250k/ows",
+      url: "http://geoserver.nationalmap.nicta.com.au/geotopo_250k/ows",
       layers: "Hydrography:bores",
+      proxy: new Cesium.DefaultProxy('https://nationalmap.gov.au/proxy/'),
       parameters: {
         format: "image/png",
         transparent: true,
       },
     });
     imageryLayers.addImageryProvider(provider);
+
 
     // Start off looking at Australia.
     viewer.camera.setView({

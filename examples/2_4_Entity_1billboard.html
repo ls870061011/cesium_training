@@ -44,6 +44,7 @@
       // description: "",
       // orientation: "",
       position: Cesium.Cartesian3.fromDegrees(-75.59777, 40.03883),
+      // billboard:new Cesium.BillboardGraphics(options),
       billboard: {
         show: true, // default
         image: "./images/Cesium_Logo_overlay.png", // default: undefined
@@ -77,12 +78,12 @@
         // 根据广告牌与相机的距离获取或设置广告牌的近和远缩放属性  type:NearFarScalar
         scaleByDistance: new Cesium.NearFarScalar(1.0e3, 2.0, 2.0e3, 1.0),
         // 根据广告牌到相机的距离，获取或设置广告牌的近和远半透明属性  type:NearFarScalar
-        translucencyByDistance: new Cesium.NearFarScalar(
-          1.0e3,
-          1.0,
-          1.5e6,
-          0.5
-        ),
+        // translucencyByDistance: new Cesium.NearFarScalar(
+        //   1.0e3,
+        //   1.0,
+        //   1.5e6,
+        //   0.5
+        // ),
         // 根据广告牌与摄像头的距离，获取或设置广告牌的近像素偏移量和远像素偏移量缩放属性  type:NearFarScalar
         pixelOffsetScaleByDistance: new Cesium.NearFarScalar(
           1.0e3,
@@ -92,10 +93,10 @@
         ),
 
         // 设置1000米和2000米之间可见  type:DistanceDisplayCondition
-        // distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
-        //   1.0e3,
-        //   2.0e3
-        // ),
+        distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
+          1.0e3,
+          2.0e3
+        ),
         // 获取或设置与相机的距离，在深度处禁用深度测试，例如，以防止剪切地形。
         // 设置为零时，将始终应用深度测试。设置为Number.POSITIVE_INFINITY时，永远不会应用深度测试。
         disableDepthTestDistance: Number.POSITIVE_INFINITY,

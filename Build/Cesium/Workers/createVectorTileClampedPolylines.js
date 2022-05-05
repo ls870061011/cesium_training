@@ -1,1 +1,559 @@
-define(["./AttributeCompression-f7a901f9","./Matrix2-c6c16658","./combine-e9466e32","./IndexDatatype-ddbc25a7","./ComponentDatatype-3d0a0aac","./createTaskProcessorWorker","./RuntimeError-5b082e8f","./when-4bbc8319","./WebGLConstants-508b9636"],(function(t,e,a,s,n,r,i,o,c){"use strict";const d=32767,l=Math.cos(n.CesiumMath.toRadians(150)),f=new e.Cartographic,h=new e.Cartesian3;const u=new e.Cartographic,C=new e.Cartographic;function p(t){const e=8*t,a=3*e,n=4*e;this.startEllipsoidNormals=new Float32Array(a),this.endEllipsoidNormals=new Float32Array(a),this.startPositionAndHeights=new Float32Array(n),this.startFaceNormalAndVertexCornerIds=new Float32Array(n),this.endPositionAndHeights=new Float32Array(n),this.endFaceNormalAndHalfWidths=new Float32Array(n),this.vertexBatchIds=new Uint16Array(e),this.indices=s.IndexDatatype.createTypedArray(e,36*t),this.vec3Offset=0,this.vec4Offset=0,this.batchIdOffset=0,this.indexOffset=0,this.volumeStartIndex=0}const m=new e.Cartesian3,b=new e.Cartesian3;function A(t,a,s,n,r){const i=e.Cartesian3.subtract(s,a,b);let o=e.Cartesian3.subtract(a,t,m);return e.Cartesian3.normalize(i,i),e.Cartesian3.normalize(o,o),e.Cartesian3.dot(i,o)<l&&(o=e.Cartesian3.multiplyByScalar(o,-1,m)),e.Cartesian3.add(i,o,r),e.Cartesian3.equals(r,e.Cartesian3.ZERO)&&(r=e.Cartesian3.subtract(t,a)),e.Cartesian3.cross(r,n,r),e.Cartesian3.cross(n,r,r),e.Cartesian3.normalize(r,r),r}const w=[0,2,6,0,6,4,0,1,3,0,3,2,0,4,5,0,5,1,5,3,1,5,7,3,7,5,4,7,4,6,7,6,2,7,2,3],g=w.length,y=new e.Cartesian3,N=new e.Cartesian3,k=new e.Cartesian3,I=new e.Cartesian3,x=new e.Cartesian3;p.prototype.addVolume=function(t,a,s,n,r,i,o,c,d,l){let f=e.Cartesian3.add(a,d,y);const h=l.geodeticSurfaceNormal(f,N);f=e.Cartesian3.add(s,d,y);const u=l.geodeticSurfaceNormal(f,I),C=A(t,a,s,h,k),p=A(n,s,a,u,x),m=this.startEllipsoidNormals,b=this.endEllipsoidNormals,E=this.startPositionAndHeights,F=this.startFaceNormalAndVertexCornerIds,H=this.endPositionAndHeights,O=this.endFaceNormalAndHalfWidths,P=this.vertexBatchIds;let v,D=this.batchIdOffset,S=this.vec3Offset,M=this.vec4Offset;for(v=0;v<8;v++)e.Cartesian3.pack(h,m,S),e.Cartesian3.pack(u,b,S),e.Cartesian3.pack(a,E,M),E[M+3]=r,e.Cartesian3.pack(s,H,M),H[M+3]=i,e.Cartesian3.pack(C,F,M),F[M+3]=v,e.Cartesian3.pack(p,O,M),O[M+3]=o,P[D++]=c,S+=3,M+=4;this.batchIdOffset=D,this.vec3Offset=S,this.vec4Offset=M;const R=this.indices,U=this.volumeStartIndex,B=this.indexOffset;for(v=0;v<g;v++)R[B+v]=w[v]+U;this.volumeStartIndex+=8,this.indexOffset+=g};const E=new e.Rectangle,F=new e.Ellipsoid,H=new e.Cartesian3,O=new e.Cartesian3,P=new e.Cartesian3,v=new e.Cartesian3,D=new e.Cartesian3;return r((function(r,i){const o=new Uint16Array(r.positions),c=new Uint16Array(r.widths),l=new Uint32Array(r.counts),m=new Uint16Array(r.batchIds),b=E,A=F,w=H,g=new Float64Array(r.packedBuffer);let y=0;const N=g[y++],k=g[y++];let I;e.Rectangle.unpack(g,y,b),y+=e.Rectangle.packedLength,e.Ellipsoid.unpack(g,y,A),y+=e.Ellipsoid.packedLength,e.Cartesian3.unpack(g,y,w);let x=o.length/3;const S=o.subarray(0,x),M=o.subarray(x,2*x),R=o.subarray(2*x,3*x);t.AttributeCompression.zigZagDeltaDecode(S,M,R),function(t,a,s,n){const r=n.length,i=t.length,o=new Uint8Array(i),c=u,d=C;let l=0;for(let s=0;s<r;s++){const r=n[s];let i=r;for(let s=1;s<r;s++){const n=l+s,r=n-1;d.longitude=t[n],d.latitude=a[n],c.longitude=t[r],c.latitude=a[r],e.Cartographic.equals(d,c)&&(i--,o[r]=1)}n[s]=i,l+=r}let f=0;for(let e=0;e<i;e++)1!==o[e]&&(t[f]=t[e],a[f]=a[e],s[f]=s[e],f++)}(S,M,R,l);const U=l.length;let B=0;for(I=0;I<U;I++){B+=l[I]-1}const T=new p(B),V=function(t,a,s,r,i,o,c){const l=t.length,u=new Float64Array(3*l);for(let C=0;C<l;++C){const l=t[C],p=a[C],m=s[C],b=n.CesiumMath.lerp(r.west,r.east,l/d),A=n.CesiumMath.lerp(r.south,r.north,p/d),w=n.CesiumMath.lerp(i,o,m/d),g=e.Cartographic.fromRadians(b,A,w,f),y=c.cartographicToCartesian(g,h);e.Cartesian3.pack(y,u,3*C)}return u}(S,M,R,b,N,k,A);x=S.length;const W=new Float32Array(3*x);for(I=0;I<x;++I)W[3*I]=V[3*I]-w.x,W[3*I+1]=V[3*I+1]-w.y,W[3*I+2]=V[3*I+2]-w.z;let z=0,q=0;for(I=0;I<U;I++){const t=l[I]-1,a=.5*c[I],s=m[I],r=z;for(let i=0;i<t;i++){const o=e.Cartesian3.unpack(W,z,P),c=e.Cartesian3.unpack(W,z+3,v);let l=R[q],f=R[q+1];l=n.CesiumMath.lerp(N,k,l/d),f=n.CesiumMath.lerp(N,k,f/d),q++;let h=O,u=D;if(0===i){const a=r+3*t,s=e.Cartesian3.unpack(W,a,O);if(e.Cartesian3.equals(s,o))e.Cartesian3.unpack(W,a-3,h);else{const t=e.Cartesian3.subtract(o,c,O);h=e.Cartesian3.add(t,o,O)}}else e.Cartesian3.unpack(W,z-3,h);if(i===t-1){const t=e.Cartesian3.unpack(W,r,D);if(e.Cartesian3.equals(t,c))e.Cartesian3.unpack(W,r+3,u);else{const t=e.Cartesian3.subtract(c,o,D);u=e.Cartesian3.add(t,c,D)}}else e.Cartesian3.unpack(W,z+6,u);T.addVolume(h,o,c,u,l,f,a,s,w,A),z+=3}z+=3,q++}const L=T.indices;i.push(T.startEllipsoidNormals.buffer),i.push(T.endEllipsoidNormals.buffer),i.push(T.startPositionAndHeights.buffer),i.push(T.startFaceNormalAndVertexCornerIds.buffer),i.push(T.endPositionAndHeights.buffer),i.push(T.endFaceNormalAndHalfWidths.buffer),i.push(T.vertexBatchIds.buffer),i.push(L.buffer);let _={indexDatatype:2===L.BYTES_PER_ELEMENT?s.IndexDatatype.UNSIGNED_SHORT:s.IndexDatatype.UNSIGNED_INT,startEllipsoidNormals:T.startEllipsoidNormals.buffer,endEllipsoidNormals:T.endEllipsoidNormals.buffer,startPositionAndHeights:T.startPositionAndHeights.buffer,startFaceNormalAndVertexCornerIds:T.startFaceNormalAndVertexCornerIds.buffer,endPositionAndHeights:T.endPositionAndHeights.buffer,endFaceNormalAndHalfWidths:T.endFaceNormalAndHalfWidths.buffer,vertexBatchIds:T.vertexBatchIds.buffer,indices:L.buffer};if(r.keepDecodedPositions){const t=function(t){const e=t.length,a=new Uint32Array(e+1);let s=0;for(let n=0;n<e;++n)a[n]=s,s+=t[n];return a[e]=s,a}(l);i.push(V.buffer,t.buffer),_=a.combine(_,{decodedPositions:V.buffer,decodedPositionOffsets:t.buffer})}return _}))}));
+/**
+ * Cesium - https://github.com/CesiumGS/cesium
+ *
+ * Copyright 2011-2020 Cesium Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Columbus View (Pat. Pend.)
+ *
+ * Portions licensed separately.
+ * See https://github.com/CesiumGS/cesium/blob/main/LICENSE.md for full licensing details.
+ */
+
+define(['./AttributeCompression-d0b97a83', './Matrix2-d35cf4b5', './combine-3c023bda', './IndexDatatype-bed3935d', './ComponentDatatype-9e86ac8f', './createTaskProcessorWorker', './RuntimeError-8952249c', './defaultValue-81eec7ed', './WebGLConstants-508b9636'], (function (AttributeCompression, Matrix2, combine, IndexDatatype, ComponentDatatype, createTaskProcessorWorker, RuntimeError, defaultValue, WebGLConstants) { 'use strict';
+
+  const MAX_SHORT = 32767;
+  const MITER_BREAK = Math.cos(ComponentDatatype.CesiumMath.toRadians(150.0));
+
+  const scratchBVCartographic = new Matrix2.Cartographic();
+  const scratchEncodedPosition = new Matrix2.Cartesian3();
+
+  function decodePositions(
+    uBuffer,
+    vBuffer,
+    heightBuffer,
+    rectangle,
+    minimumHeight,
+    maximumHeight,
+    ellipsoid
+  ) {
+    const positionsLength = uBuffer.length;
+    const decodedPositions = new Float64Array(positionsLength * 3);
+    for (let i = 0; i < positionsLength; ++i) {
+      const u = uBuffer[i];
+      const v = vBuffer[i];
+      const h = heightBuffer[i];
+
+      const lon = ComponentDatatype.CesiumMath.lerp(rectangle.west, rectangle.east, u / MAX_SHORT);
+      const lat = ComponentDatatype.CesiumMath.lerp(
+        rectangle.south,
+        rectangle.north,
+        v / MAX_SHORT
+      );
+      const alt = ComponentDatatype.CesiumMath.lerp(minimumHeight, maximumHeight, h / MAX_SHORT);
+
+      const cartographic = Matrix2.Cartographic.fromRadians(
+        lon,
+        lat,
+        alt,
+        scratchBVCartographic
+      );
+      const decodedPosition = ellipsoid.cartographicToCartesian(
+        cartographic,
+        scratchEncodedPosition
+      );
+      Matrix2.Cartesian3.pack(decodedPosition, decodedPositions, i * 3);
+    }
+    return decodedPositions;
+  }
+
+  function getPositionOffsets(counts) {
+    const countsLength = counts.length;
+    const positionOffsets = new Uint32Array(countsLength + 1);
+    let offset = 0;
+    for (let i = 0; i < countsLength; ++i) {
+      positionOffsets[i] = offset;
+      offset += counts[i];
+    }
+    positionOffsets[countsLength] = offset;
+    return positionOffsets;
+  }
+
+  const previousCompressedCartographicScratch = new Matrix2.Cartographic();
+  const currentCompressedCartographicScratch = new Matrix2.Cartographic();
+  function removeDuplicates(uBuffer, vBuffer, heightBuffer, counts) {
+    const countsLength = counts.length;
+    const positionsLength = uBuffer.length;
+    const markRemoval = new Uint8Array(positionsLength);
+    const previous = previousCompressedCartographicScratch;
+    const current = currentCompressedCartographicScratch;
+    let offset = 0;
+    for (let i = 0; i < countsLength; i++) {
+      const count = counts[i];
+      let updatedCount = count;
+      for (let j = 1; j < count; j++) {
+        const index = offset + j;
+        const previousIndex = index - 1;
+        current.longitude = uBuffer[index];
+        current.latitude = vBuffer[index];
+        previous.longitude = uBuffer[previousIndex];
+        previous.latitude = vBuffer[previousIndex];
+
+        if (Matrix2.Cartographic.equals(current, previous)) {
+          updatedCount--;
+          markRemoval[previousIndex] = 1;
+        }
+      }
+      counts[i] = updatedCount;
+      offset += count;
+    }
+
+    let nextAvailableIndex = 0;
+    for (let k = 0; k < positionsLength; k++) {
+      if (markRemoval[k] !== 1) {
+        uBuffer[nextAvailableIndex] = uBuffer[k];
+        vBuffer[nextAvailableIndex] = vBuffer[k];
+        heightBuffer[nextAvailableIndex] = heightBuffer[k];
+        nextAvailableIndex++;
+      }
+    }
+  }
+
+  function VertexAttributesAndIndices(volumesCount) {
+    const vertexCount = volumesCount * 8;
+    const vec3Floats = vertexCount * 3;
+    const vec4Floats = vertexCount * 4;
+    this.startEllipsoidNormals = new Float32Array(vec3Floats);
+    this.endEllipsoidNormals = new Float32Array(vec3Floats);
+    this.startPositionAndHeights = new Float32Array(vec4Floats);
+    this.startFaceNormalAndVertexCornerIds = new Float32Array(vec4Floats);
+    this.endPositionAndHeights = new Float32Array(vec4Floats);
+    this.endFaceNormalAndHalfWidths = new Float32Array(vec4Floats);
+    this.vertexBatchIds = new Uint16Array(vertexCount);
+
+    this.indices = IndexDatatype.IndexDatatype.createTypedArray(vertexCount, 36 * volumesCount);
+
+    this.vec3Offset = 0;
+    this.vec4Offset = 0;
+    this.batchIdOffset = 0;
+    this.indexOffset = 0;
+
+    this.volumeStartIndex = 0;
+  }
+
+  const towardCurrScratch = new Matrix2.Cartesian3();
+  const towardNextScratch = new Matrix2.Cartesian3();
+  function computeMiteredNormal(
+    previousPosition,
+    position,
+    nextPosition,
+    ellipsoidSurfaceNormal,
+    result
+  ) {
+    const towardNext = Matrix2.Cartesian3.subtract(
+      nextPosition,
+      position,
+      towardNextScratch
+    );
+    let towardCurr = Matrix2.Cartesian3.subtract(
+      position,
+      previousPosition,
+      towardCurrScratch
+    );
+    Matrix2.Cartesian3.normalize(towardNext, towardNext);
+    Matrix2.Cartesian3.normalize(towardCurr, towardCurr);
+
+    if (Matrix2.Cartesian3.dot(towardNext, towardCurr) < MITER_BREAK) {
+      towardCurr = Matrix2.Cartesian3.multiplyByScalar(
+        towardCurr,
+        -1.0,
+        towardCurrScratch
+      );
+    }
+
+    Matrix2.Cartesian3.add(towardNext, towardCurr, result);
+    if (Matrix2.Cartesian3.equals(result, Matrix2.Cartesian3.ZERO)) {
+      result = Matrix2.Cartesian3.subtract(previousPosition, position);
+    }
+
+    // Make sure the normal is orthogonal to the ellipsoid surface normal
+    Matrix2.Cartesian3.cross(result, ellipsoidSurfaceNormal, result);
+    Matrix2.Cartesian3.cross(ellipsoidSurfaceNormal, result, result);
+    Matrix2.Cartesian3.normalize(result, result);
+    return result;
+  }
+
+  // Winding order is reversed so each segment's volume is inside-out
+  //          3-----------7
+  //         /|   left   /|
+  //        / | 1       / |
+  //       2-----------6  5  end
+  //       | /         | /
+  // start |/  right   |/
+  //       0-----------4
+  //
+  const REFERENCE_INDICES = [
+    0,
+    2,
+    6,
+    0,
+    6,
+    4, // right
+    0,
+    1,
+    3,
+    0,
+    3,
+    2, // start face
+    0,
+    4,
+    5,
+    0,
+    5,
+    1, // bottom
+    5,
+    3,
+    1,
+    5,
+    7,
+    3, // left
+    7,
+    5,
+    4,
+    7,
+    4,
+    6, // end face
+    7,
+    6,
+    2,
+    7,
+    2,
+    3, // top
+  ];
+  const REFERENCE_INDICES_LENGTH = REFERENCE_INDICES.length;
+
+  const positionScratch = new Matrix2.Cartesian3();
+  const scratchStartEllipsoidNormal = new Matrix2.Cartesian3();
+  const scratchStartFaceNormal = new Matrix2.Cartesian3();
+  const scratchEndEllipsoidNormal = new Matrix2.Cartesian3();
+  const scratchEndFaceNormal = new Matrix2.Cartesian3();
+  VertexAttributesAndIndices.prototype.addVolume = function (
+    preStartRTC,
+    startRTC,
+    endRTC,
+    postEndRTC,
+    startHeight,
+    endHeight,
+    halfWidth,
+    batchId,
+    center,
+    ellipsoid
+  ) {
+    let position = Matrix2.Cartesian3.add(startRTC, center, positionScratch);
+    const startEllipsoidNormal = ellipsoid.geodeticSurfaceNormal(
+      position,
+      scratchStartEllipsoidNormal
+    );
+    position = Matrix2.Cartesian3.add(endRTC, center, positionScratch);
+    const endEllipsoidNormal = ellipsoid.geodeticSurfaceNormal(
+      position,
+      scratchEndEllipsoidNormal
+    );
+
+    const startFaceNormal = computeMiteredNormal(
+      preStartRTC,
+      startRTC,
+      endRTC,
+      startEllipsoidNormal,
+      scratchStartFaceNormal
+    );
+    const endFaceNormal = computeMiteredNormal(
+      postEndRTC,
+      endRTC,
+      startRTC,
+      endEllipsoidNormal,
+      scratchEndFaceNormal
+    );
+
+    const startEllipsoidNormals = this.startEllipsoidNormals;
+    const endEllipsoidNormals = this.endEllipsoidNormals;
+    const startPositionAndHeights = this.startPositionAndHeights;
+    const startFaceNormalAndVertexCornerIds = this
+      .startFaceNormalAndVertexCornerIds;
+    const endPositionAndHeights = this.endPositionAndHeights;
+    const endFaceNormalAndHalfWidths = this.endFaceNormalAndHalfWidths;
+    const vertexBatchIds = this.vertexBatchIds;
+
+    let batchIdOffset = this.batchIdOffset;
+    let vec3Offset = this.vec3Offset;
+    let vec4Offset = this.vec4Offset;
+
+    let i;
+    for (i = 0; i < 8; i++) {
+      Matrix2.Cartesian3.pack(startEllipsoidNormal, startEllipsoidNormals, vec3Offset);
+      Matrix2.Cartesian3.pack(endEllipsoidNormal, endEllipsoidNormals, vec3Offset);
+
+      Matrix2.Cartesian3.pack(startRTC, startPositionAndHeights, vec4Offset);
+      startPositionAndHeights[vec4Offset + 3] = startHeight;
+
+      Matrix2.Cartesian3.pack(endRTC, endPositionAndHeights, vec4Offset);
+      endPositionAndHeights[vec4Offset + 3] = endHeight;
+
+      Matrix2.Cartesian3.pack(
+        startFaceNormal,
+        startFaceNormalAndVertexCornerIds,
+        vec4Offset
+      );
+      startFaceNormalAndVertexCornerIds[vec4Offset + 3] = i;
+
+      Matrix2.Cartesian3.pack(endFaceNormal, endFaceNormalAndHalfWidths, vec4Offset);
+      endFaceNormalAndHalfWidths[vec4Offset + 3] = halfWidth;
+
+      vertexBatchIds[batchIdOffset++] = batchId;
+
+      vec3Offset += 3;
+      vec4Offset += 4;
+    }
+
+    this.batchIdOffset = batchIdOffset;
+    this.vec3Offset = vec3Offset;
+    this.vec4Offset = vec4Offset;
+    const indices = this.indices;
+    const volumeStartIndex = this.volumeStartIndex;
+
+    const indexOffset = this.indexOffset;
+    for (i = 0; i < REFERENCE_INDICES_LENGTH; i++) {
+      indices[indexOffset + i] = REFERENCE_INDICES[i] + volumeStartIndex;
+    }
+
+    this.volumeStartIndex += 8;
+    this.indexOffset += REFERENCE_INDICES_LENGTH;
+  };
+
+  const scratchRectangle = new Matrix2.Rectangle();
+  const scratchEllipsoid = new Matrix2.Ellipsoid();
+  const scratchCenter = new Matrix2.Cartesian3();
+
+  const scratchPrev = new Matrix2.Cartesian3();
+  const scratchP0 = new Matrix2.Cartesian3();
+  const scratchP1 = new Matrix2.Cartesian3();
+  const scratchNext = new Matrix2.Cartesian3();
+  function createVectorTileClampedPolylines(parameters, transferableObjects) {
+    const encodedPositions = new Uint16Array(parameters.positions);
+    const widths = new Uint16Array(parameters.widths);
+    const counts = new Uint32Array(parameters.counts);
+    const batchIds = new Uint16Array(parameters.batchIds);
+
+    // Unpack tile decoding parameters
+    const rectangle = scratchRectangle;
+    const ellipsoid = scratchEllipsoid;
+    const center = scratchCenter;
+    const packedBuffer = new Float64Array(parameters.packedBuffer);
+
+    let offset = 0;
+    const minimumHeight = packedBuffer[offset++];
+    const maximumHeight = packedBuffer[offset++];
+
+    Matrix2.Rectangle.unpack(packedBuffer, offset, rectangle);
+    offset += Matrix2.Rectangle.packedLength;
+
+    Matrix2.Ellipsoid.unpack(packedBuffer, offset, ellipsoid);
+    offset += Matrix2.Ellipsoid.packedLength;
+
+    Matrix2.Cartesian3.unpack(packedBuffer, offset, center);
+
+    let i;
+
+    // Unpack positions and generate volumes
+    let positionsLength = encodedPositions.length / 3;
+    const uBuffer = encodedPositions.subarray(0, positionsLength);
+    const vBuffer = encodedPositions.subarray(
+      positionsLength,
+      2 * positionsLength
+    );
+    const heightBuffer = encodedPositions.subarray(
+      2 * positionsLength,
+      3 * positionsLength
+    );
+    AttributeCompression.AttributeCompression.zigZagDeltaDecode(uBuffer, vBuffer, heightBuffer);
+
+    removeDuplicates(uBuffer, vBuffer, heightBuffer, counts);
+
+    // Figure out how many volumes and how many vertices there will be.
+    const countsLength = counts.length;
+    let volumesCount = 0;
+    for (i = 0; i < countsLength; i++) {
+      const polylinePositionCount = counts[i];
+      volumesCount += polylinePositionCount - 1;
+    }
+
+    const attribsAndIndices = new VertexAttributesAndIndices(volumesCount);
+
+    const positions = decodePositions(
+      uBuffer,
+      vBuffer,
+      heightBuffer,
+      rectangle,
+      minimumHeight,
+      maximumHeight,
+      ellipsoid);
+
+    positionsLength = uBuffer.length;
+    const positionsRTC = new Float32Array(positionsLength * 3);
+    for (i = 0; i < positionsLength; ++i) {
+      positionsRTC[i * 3] = positions[i * 3] - center.x;
+      positionsRTC[i * 3 + 1] = positions[i * 3 + 1] - center.y;
+      positionsRTC[i * 3 + 2] = positions[i * 3 + 2] - center.z;
+    }
+
+    let currentPositionIndex = 0;
+    let currentHeightIndex = 0;
+    for (i = 0; i < countsLength; i++) {
+      const polylineVolumeCount = counts[i] - 1;
+      const halfWidth = widths[i] * 0.5;
+      const batchId = batchIds[i];
+      const volumeFirstPositionIndex = currentPositionIndex;
+      for (let j = 0; j < polylineVolumeCount; j++) {
+        const volumeStart = Matrix2.Cartesian3.unpack(
+          positionsRTC,
+          currentPositionIndex,
+          scratchP0
+        );
+        const volumeEnd = Matrix2.Cartesian3.unpack(
+          positionsRTC,
+          currentPositionIndex + 3,
+          scratchP1
+        );
+
+        let startHeight = heightBuffer[currentHeightIndex];
+        let endHeight = heightBuffer[currentHeightIndex + 1];
+        startHeight = ComponentDatatype.CesiumMath.lerp(
+          minimumHeight,
+          maximumHeight,
+          startHeight / MAX_SHORT
+        );
+        endHeight = ComponentDatatype.CesiumMath.lerp(
+          minimumHeight,
+          maximumHeight,
+          endHeight / MAX_SHORT
+        );
+
+        currentHeightIndex++;
+
+        let preStart = scratchPrev;
+        let postEnd = scratchNext;
+        if (j === 0) {
+          // Check if this volume is like a loop
+          const finalPositionIndex =
+            volumeFirstPositionIndex + polylineVolumeCount * 3;
+          const finalPosition = Matrix2.Cartesian3.unpack(
+            positionsRTC,
+            finalPositionIndex,
+            scratchPrev
+          );
+          if (Matrix2.Cartesian3.equals(finalPosition, volumeStart)) {
+            Matrix2.Cartesian3.unpack(positionsRTC, finalPositionIndex - 3, preStart);
+          } else {
+            const offsetPastStart = Matrix2.Cartesian3.subtract(
+              volumeStart,
+              volumeEnd,
+              scratchPrev
+            );
+            preStart = Matrix2.Cartesian3.add(offsetPastStart, volumeStart, scratchPrev);
+          }
+        } else {
+          Matrix2.Cartesian3.unpack(positionsRTC, currentPositionIndex - 3, preStart);
+        }
+
+        if (j === polylineVolumeCount - 1) {
+          // Check if this volume is like a loop
+          const firstPosition = Matrix2.Cartesian3.unpack(
+            positionsRTC,
+            volumeFirstPositionIndex,
+            scratchNext
+          );
+          if (Matrix2.Cartesian3.equals(firstPosition, volumeEnd)) {
+            Matrix2.Cartesian3.unpack(
+              positionsRTC,
+              volumeFirstPositionIndex + 3,
+              postEnd
+            );
+          } else {
+            const offsetPastEnd = Matrix2.Cartesian3.subtract(
+              volumeEnd,
+              volumeStart,
+              scratchNext
+            );
+            postEnd = Matrix2.Cartesian3.add(offsetPastEnd, volumeEnd, scratchNext);
+          }
+        } else {
+          Matrix2.Cartesian3.unpack(positionsRTC, currentPositionIndex + 6, postEnd);
+        }
+
+        attribsAndIndices.addVolume(
+          preStart,
+          volumeStart,
+          volumeEnd,
+          postEnd,
+          startHeight,
+          endHeight,
+          halfWidth,
+          batchId,
+          center,
+          ellipsoid
+        );
+
+        currentPositionIndex += 3;
+      }
+      currentPositionIndex += 3;
+      currentHeightIndex++;
+    }
+
+    const indices = attribsAndIndices.indices;
+
+    transferableObjects.push(attribsAndIndices.startEllipsoidNormals.buffer);
+    transferableObjects.push(attribsAndIndices.endEllipsoidNormals.buffer);
+    transferableObjects.push(attribsAndIndices.startPositionAndHeights.buffer);
+    transferableObjects.push(
+      attribsAndIndices.startFaceNormalAndVertexCornerIds.buffer
+    );
+    transferableObjects.push(attribsAndIndices.endPositionAndHeights.buffer);
+    transferableObjects.push(attribsAndIndices.endFaceNormalAndHalfWidths.buffer);
+    transferableObjects.push(attribsAndIndices.vertexBatchIds.buffer);
+    transferableObjects.push(indices.buffer);
+
+    let results = {
+      indexDatatype:
+        indices.BYTES_PER_ELEMENT === 2
+          ? IndexDatatype.IndexDatatype.UNSIGNED_SHORT
+          : IndexDatatype.IndexDatatype.UNSIGNED_INT,
+      startEllipsoidNormals: attribsAndIndices.startEllipsoidNormals.buffer,
+      endEllipsoidNormals: attribsAndIndices.endEllipsoidNormals.buffer,
+      startPositionAndHeights: attribsAndIndices.startPositionAndHeights.buffer,
+      startFaceNormalAndVertexCornerIds:
+        attribsAndIndices.startFaceNormalAndVertexCornerIds.buffer,
+      endPositionAndHeights: attribsAndIndices.endPositionAndHeights.buffer,
+      endFaceNormalAndHalfWidths:
+        attribsAndIndices.endFaceNormalAndHalfWidths.buffer,
+      vertexBatchIds: attribsAndIndices.vertexBatchIds.buffer,
+      indices: indices.buffer,
+    };
+
+    if (parameters.keepDecodedPositions) {
+      const positionOffsets = getPositionOffsets(counts);
+      transferableObjects.push(positions.buffer, positionOffsets.buffer);
+      results = combine.combine(results, {
+        decodedPositions: positions.buffer,
+        decodedPositionOffsets: positionOffsets.buffer,
+      });
+    }
+
+    return results;
+  }
+  var createVectorTileClampedPolylines$1 = createTaskProcessorWorker(createVectorTileClampedPolylines);
+
+  return createVectorTileClampedPolylines$1;
+
+}));
+//# sourceMappingURL=createVectorTileClampedPolylines.js.map

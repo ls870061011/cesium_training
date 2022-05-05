@@ -1,1 +1,36 @@
-define(["./CylinderGeometry-14096659","./when-4bbc8319","./GeometryOffsetAttribute-821af768","./RuntimeError-5b082e8f","./Transforms-f15de320","./Matrix2-c6c16658","./ComponentDatatype-3d0a0aac","./WebGLConstants-508b9636","./combine-e9466e32","./CylinderGeometryLibrary-95202773","./GeometryAttribute-8350368e","./GeometryAttributes-7827a6c2","./IndexDatatype-ddbc25a7","./VertexFormat-7b982b01"],(function(e,t,r,n,a,o,i,y,b,m,c,d,f,u){"use strict";return function(r,n){return t.defined(n)&&(r=e.CylinderGeometry.unpack(r,n)),e.CylinderGeometry.createGeometry(r)}}));
+/**
+ * Cesium - https://github.com/CesiumGS/cesium
+ *
+ * Copyright 2011-2020 Cesium Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Columbus View (Pat. Pend.)
+ *
+ * Portions licensed separately.
+ * See https://github.com/CesiumGS/cesium/blob/main/LICENSE.md for full licensing details.
+ */
+
+define(['./CylinderGeometry-0a5c4b3b', './defaultValue-81eec7ed', './GeometryOffsetAttribute-2bff0974', './RuntimeError-8952249c', './Transforms-f0a54c7b', './Matrix2-d35cf4b5', './ComponentDatatype-9e86ac8f', './WebGLConstants-508b9636', './_commonjsHelpers-3aae1032-26891ab7', './combine-3c023bda', './CylinderGeometryLibrary-0fa93765', './GeometryAttribute-eeb38987', './GeometryAttributes-32b29525', './IndexDatatype-bed3935d', './VertexFormat-7df34ea5'], (function (CylinderGeometry, defaultValue, GeometryOffsetAttribute, RuntimeError, Transforms, Matrix2, ComponentDatatype, WebGLConstants, _commonjsHelpers3aae1032, combine, CylinderGeometryLibrary, GeometryAttribute, GeometryAttributes, IndexDatatype, VertexFormat) { 'use strict';
+
+  function createCylinderGeometry(cylinderGeometry, offset) {
+    if (defaultValue.defined(offset)) {
+      cylinderGeometry = CylinderGeometry.CylinderGeometry.unpack(cylinderGeometry, offset);
+    }
+    return CylinderGeometry.CylinderGeometry.createGeometry(cylinderGeometry);
+  }
+
+  return createCylinderGeometry;
+
+}));
+//# sourceMappingURL=createCylinderGeometry.js.map

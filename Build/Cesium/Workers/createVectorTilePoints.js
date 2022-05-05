@@ -1,1 +1,103 @@
-define(["./AttributeCompression-f7a901f9","./Matrix2-c6c16658","./ComponentDatatype-3d0a0aac","./createTaskProcessorWorker","./RuntimeError-5b082e8f","./when-4bbc8319","./WebGLConstants-508b9636"],(function(e,t,a,n,r,o,i){"use strict";const s=32767,c=new t.Cartographic,u=new t.Cartesian3,p=new t.Rectangle,l=new t.Ellipsoid,f={min:void 0,max:void 0};return n((function(n,r){const o=new Uint16Array(n.positions);!function(e){e=new Float64Array(e);let a=0;f.min=e[a++],f.max=e[a++],t.Rectangle.unpack(e,a,p),a+=t.Rectangle.packedLength,t.Ellipsoid.unpack(e,a,l)}(n.packedBuffer);const i=p,m=l,h=f.min,b=f.max,C=o.length/3,g=o.subarray(0,C),d=o.subarray(C,2*C),w=o.subarray(2*C,3*C);e.AttributeCompression.zigZagDeltaDecode(g,d,w);const k=new Float64Array(o.length);for(let e=0;e<C;++e){const n=g[e],r=d[e],o=w[e],p=a.CesiumMath.lerp(i.west,i.east,n/s),l=a.CesiumMath.lerp(i.south,i.north,r/s),f=a.CesiumMath.lerp(h,b,o/s),C=t.Cartographic.fromRadians(p,l,f,c),y=m.cartographicToCartesian(C,u);t.Cartesian3.pack(y,k,3*e)}return r.push(k.buffer),{positions:k.buffer}}))}));
+/**
+ * Cesium - https://github.com/CesiumGS/cesium
+ *
+ * Copyright 2011-2020 Cesium Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Columbus View (Pat. Pend.)
+ *
+ * Portions licensed separately.
+ * See https://github.com/CesiumGS/cesium/blob/main/LICENSE.md for full licensing details.
+ */
+
+define(['./AttributeCompression-d0b97a83', './Matrix2-d35cf4b5', './ComponentDatatype-9e86ac8f', './createTaskProcessorWorker', './RuntimeError-8952249c', './defaultValue-81eec7ed', './WebGLConstants-508b9636'], (function (AttributeCompression, Matrix2, ComponentDatatype, createTaskProcessorWorker, RuntimeError, defaultValue, WebGLConstants) { 'use strict';
+
+  const maxShort = 32767;
+
+  const scratchBVCartographic = new Matrix2.Cartographic();
+  const scratchEncodedPosition = new Matrix2.Cartesian3();
+
+  const scratchRectangle = new Matrix2.Rectangle();
+  const scratchEllipsoid = new Matrix2.Ellipsoid();
+  const scratchMinMaxHeights = {
+    min: undefined,
+    max: undefined,
+  };
+
+  function unpackBuffer(packedBuffer) {
+    packedBuffer = new Float64Array(packedBuffer);
+
+    let offset = 0;
+    scratchMinMaxHeights.min = packedBuffer[offset++];
+    scratchMinMaxHeights.max = packedBuffer[offset++];
+
+    Matrix2.Rectangle.unpack(packedBuffer, offset, scratchRectangle);
+    offset += Matrix2.Rectangle.packedLength;
+
+    Matrix2.Ellipsoid.unpack(packedBuffer, offset, scratchEllipsoid);
+  }
+
+  function createVectorTilePoints(parameters, transferableObjects) {
+    const positions = new Uint16Array(parameters.positions);
+
+    unpackBuffer(parameters.packedBuffer);
+    const rectangle = scratchRectangle;
+    const ellipsoid = scratchEllipsoid;
+    const minimumHeight = scratchMinMaxHeights.min;
+    const maximumHeight = scratchMinMaxHeights.max;
+
+    const positionsLength = positions.length / 3;
+    const uBuffer = positions.subarray(0, positionsLength);
+    const vBuffer = positions.subarray(positionsLength, 2 * positionsLength);
+    const heightBuffer = positions.subarray(
+      2 * positionsLength,
+      3 * positionsLength
+    );
+    AttributeCompression.AttributeCompression.zigZagDeltaDecode(uBuffer, vBuffer, heightBuffer);
+
+    const decoded = new Float64Array(positions.length);
+    for (let i = 0; i < positionsLength; ++i) {
+      const u = uBuffer[i];
+      const v = vBuffer[i];
+      const h = heightBuffer[i];
+
+      const lon = ComponentDatatype.CesiumMath.lerp(rectangle.west, rectangle.east, u / maxShort);
+      const lat = ComponentDatatype.CesiumMath.lerp(rectangle.south, rectangle.north, v / maxShort);
+      const alt = ComponentDatatype.CesiumMath.lerp(minimumHeight, maximumHeight, h / maxShort);
+
+      const cartographic = Matrix2.Cartographic.fromRadians(
+        lon,
+        lat,
+        alt,
+        scratchBVCartographic
+      );
+      const decodedPosition = ellipsoid.cartographicToCartesian(
+        cartographic,
+        scratchEncodedPosition
+      );
+      Matrix2.Cartesian3.pack(decodedPosition, decoded, i * 3);
+    }
+
+    transferableObjects.push(decoded.buffer);
+
+    return {
+      positions: decoded.buffer,
+    };
+  }
+  var createVectorTilePoints$1 = createTaskProcessorWorker(createVectorTilePoints);
+
+  return createVectorTilePoints$1;
+
+}));
+//# sourceMappingURL=createVectorTilePoints.js.map

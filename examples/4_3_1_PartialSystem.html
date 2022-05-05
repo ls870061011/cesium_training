@@ -124,30 +124,46 @@
     viewer.trackedEntity = entity;
 
     var scene = viewer.scene;
+    //初始化设置ParticleSystem的各项参数,因为这是一个动态变化的粒子，所以有start、end和min、max等参数设置
     var particleSystem = scene.primitives.add(
       new Cesium.ParticleSystem({
+        //每个粒子的图像
         image: "./data/smoke.png",
-        startColor: Cesium.Color.LIGHTSEAGREEN.withAlpha(0.7), // 开始颜色
-        endColor: Cesium.Color.WHITE.withAlpha(0.0), // 结束颜色
 
-        startScale: viewModel.startScale, 
-        endScale: viewModel.endScale,
-
-        minimumParticleLife: viewModel.minimumParticleLife,
-        maximumParticleLife: viewModel.maximumParticleLife,
-
-        minimumSpeed: viewModel.minimumSpeed,
-        maximumSpeed: viewModel.maximumSpeed,
-
+        //设置发射出的图像大小
         imageSize: new Cesium.Cartesian2(
           viewModel.particleSize,
           viewModel.particleSize
         ),
 
+        //startColor endColor，代替color使得粒子的颜色在粒子的生命过程中会在这两种颜色之间平滑地混合。
+        startColor: Cesium.Color.LIGHTSEAGREEN.withAlpha(0.7), // 开始颜色
+        endColor: Cesium.Color.WHITE.withAlpha(0.0), // 结束颜色
+
+        //startScale endScale，代替scale设置粒子在生命周期内显示的初始和结束尺寸，也是动态混合的作用。
+        // 值越大，初始时粒子图的大小越大
+        startScale: viewModel.startScale,
+        endScale: viewModel.endScale,
+
+        //particleLife：设置该值将会覆盖minimumParticleLife和maximumParticleLife
+        //minimumParticleLife：设置粒子寿命的可能持续时间的最小界限（以秒为单位），粒子的实际寿命将随机生成
+        //maximumParticleLife：设置粒子寿命的可能持续时间的最大界限（以秒为单位），粒子的实际寿命将随机生成
+        //值越大，尾巴越长
+        minimumParticleLife: viewModel.minimumParticleLife,
+        maximumParticleLife: viewModel.maximumParticleLife,
+
+        //设置粒子图发射之后的最小/最大速度(以米/秒为单位)
+        //值越大，尾巴飘的越高
+        minimumSpeed: viewModel.minimumSpeed,
+        maximumSpeed: viewModel.maximumSpeed,
+
+        //每秒发射的粒子数。数值越大，越浓密
         emissionRate: viewModel.emissionRate,
 
+        //粒子系统生命周期内，按照指定周期，爆发一定数量的粒子。三个参数（time，minimum，maximum）
         bursts: [
           // these burst will occasionally sync to create a multicolored effect
+          // 爆炸出的粒子的密度
           new Cesium.ParticleBurst({
             time: 5.0,
             minimum: 10,
@@ -165,12 +181,20 @@
           }),
         ],
 
+        //粒子系统会发射多久粒子，以秒为单位。默认为最大值
         lifetime: 16.0,
 
+        // 粒子系统的粒子发射器；包括四种发射器：圆形、锥体、球体、长方体
         emitter: new Cesium.CircleEmitter(2.0),
 
+        //modelMatrix： 4x4变换矩阵，将粒子系统从模型转换为世界坐标。
+        //4x4变换矩阵，用于在粒子系统内部坐标系中转换粒子系统发射器。
         emitterModelMatrix: computeEmitterModelMatrix(),
 
+        //一组强制回调。回调被传递一个粒子和上次的差值
+        //每帧都要调用的回调函数来更新粒子。
+        // 此updateCallback作用是用来改变粒子系统在每一个时间步长的属性，可以强制改变粒子系统的颜色、大小等值。
+        // 在updateCallback更改gravity重力参数，值越大，烟雾离模型越近的地方飘的越高，可能出现负值，此时烟雾会向下方飘。
         updateCallback: applyGravity,
       })
     );

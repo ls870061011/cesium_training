@@ -42,14 +42,14 @@
       position: Cesium.Cartesian3.fromDegrees(-107.0, 40.0, 3000.0),
       box: {
         show: true,
-        dimensions: new Cesium.Cartesian3(400000.0, 300000.0, 5000.0), // Cartesian3类型，用于指定框的长度，宽度和高度
+        dimensions: new Cesium.Cartesian3(400000.0, 300000.0, 50000.0), // Cartesian3类型，用于指定框的长度，宽度和高度
         // 指定距实体位置的高度是相对于什么的高度。 default: HeightReference.NONE
         // NONE	位置绝对；CLAMP_TO_GROUND	位置固定在地形上；RELATIVE_TO_GROUND 位置高度是指地形上方的高度。
         heightReference: Cesium.HeightReference.NONE,
         fill: true,
         // MaterialProperty|Color  default:Color.WHITE
-        material: Cesium.Color.RED.withAlpha(0.5),
-        outline: true,
+        material: Cesium.Color.RED.withAlpha(1),
+        outline: false ,
         // type:Property|Color  default:Color.BLACK
         outlineColor: Cesium.Color.BLACK,
         outlineWidth: 1.0,
