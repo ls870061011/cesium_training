@@ -4,8 +4,8 @@
   <script src="../Build/Cesium/Cesium.js"></script>
   <link href="../Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
 
-  <script src="https://cdn.bootcss.com/echarts/4.7.0/echarts.js"></script>
   <script src="./libs/cesium_data.js"></script>
+  <script src="./libs/echarts.js"></script>
   <script src="./libs/cesium_echartslayer.js"></script>
   <style>
     html,
@@ -34,17 +34,17 @@
       scene3DOnly: false,
       timeline: false,
       CreditsDisplay: false,
-      imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
-        url:
-          "http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer",
-        enablePickFeatures: false,
-      }),
-    });
+      // imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+      //   url:
+      //     "http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer",
+      //   enablePickFeatures: false,
+      // }),
+    }); 
     viewer.scene.globe.baseColor = new Cesium.Color(1, 1, 1, 0);
     viewer.scene.globe.depthTestAgainstTerrain = true;
     viewer._cesiumWidget._creditContainer.style.display = "none";
 
-    //let uoption = getOption(_basedata);
+    // let option = getOption(_basedata);
     let _echartLayer = new EchartsLayer(viewer, option);
   </script>
 </body>
